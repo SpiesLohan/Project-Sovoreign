@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOVEREIGN // Ascension Protocol</title>
+
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#c8a96e">
+<meta name="theme-color" content="#070710">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="SOVEREIGN">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOVEREIGN // Workout Tracker</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -25,7 +27,7 @@
     --strength:#e8a050; --endurance:#50b8e8; --flexibility:#98c878; --speed:#e870a8;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent;}
   body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 20% 0%,rgba(123,94,167,0.08) 0%,transparent 70%),radial-gradient(ellipse 50% 30% at 80% 100%,rgba(200,169,110,0.06) 0%,transparent 70%);pointer-events:none;z-index:0;}
   .noise{position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4;}
   .app{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 20px 80px;}
@@ -43,8 +45,9 @@
 
   .header-divider{width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:24px auto 0;}
 
-  .tabs{display:flex;gap:4px;margin-bottom:32px;background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:4px;flex-wrap:wrap;}
-  .tab{flex:1;min-width:72px;padding:10px 8px;background:none;border:none;color:var(--muted);font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;border-radius:1px;position:relative;}
+  /* TABS WITH FIXED SCROLLING AND NO SHIFT */
+  .tabs{display:flex;gap:4px;margin-bottom:32px;background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:4px;flex-wrap:nowrap;overflow-x:auto;}
+  .tab{flex:1;padding:10px 4px;background:none;border:1px solid transparent;color:var(--muted);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;border-radius:1px;position:relative;white-space:nowrap;}
   .tab.active{background:rgba(200,169,110,0.1);color:var(--accent);border:1px solid rgba(200,169,110,0.2);}
   .tab:hover:not(.active){color:var(--text);}
   .tab .notif{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--rank-sss);border-radius:50%;box-shadow:0 0 6px rgba(204,32,64,0.8);display:none;}
@@ -117,6 +120,7 @@
   .exercise-info .unit{font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
   .exercise-info .pb-label{font-size:12px;color:var(--muted);margin-top:4px;}
   .exercise-info .pb-value{color:var(--accent);font-weight:700;font-size:14px;}
+  .pb-crown{font-size:10px;margin-left:4px;}
   .exercise-actions{display:flex;gap:8px;align-items:center;}
   .dir-tag{font-size:10px;letter-spacing:1px;margin-left:8px;}
   .dir-up{color:#4a9f6a;} .dir-down{color:#5a9fc8;}
@@ -177,7 +181,7 @@
   .tier-legend{color:var(--rank-sss);text-shadow:0 0 10px rgba(204,32,64,0.6);}
 
   /* TOAST */
-  .toast-wrap{position:fixed;bottom:30px;right:30px;z-index:200;display:flex;flex-direction:column;gap:10px;}
+  .toast-wrap{position:fixed;bottom:30px;right:30px;z-index:200;display:flex;flex-direction:column;gap:10px;pointer-events:none;}
   .toast{background:#0d0d1a;border:1px solid rgba(200,169,110,0.5);border-radius:2px;padding:14px 18px;display:flex;gap:14px;align-items:center;min-width:280px;box-shadow:0 8px 40px rgba(0,0,0,0.6);transform:translateX(120%);transition:transform .4s cubic-bezier(.4,0,.2,1);}
   .toast.show{transform:translateX(0);}
   .toast-icon{font-size:26px;}
@@ -197,9 +201,16 @@
   .modal-btns{display:flex;gap:12px;margin-top:18px;}
   .modal-btns .btn{flex:1;}
   .modal-new-achs{margin-top:14px;}
+  .mna-item{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(200,169,110,0.05);border:1px solid rgba(200,169,110,0.2);border-radius:2px;margin-bottom:8px;}
+  .mna-icon{font-size:22px;}
+  .mna-name{font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);}
+
+  /* RANK GUIDE */
+  .rank-guide{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+  .rg-item{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
 
   .empty-state{text-align:center;padding:48px 24px;color:var(--muted);font-size:13px;letter-spacing:2px;text-transform:uppercase;font-family:'Cinzel',serif;}
-  ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  ::-webkit-scrollbar{width:4px; height: 4px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 </style>
 </head>
 <body>
@@ -236,7 +247,7 @@
     </div>
 
     <div class="panel">
-      <div class="panel-title">Add Exercise</div>
+      <div class="panel-title">Manage Exercise</div>
       <div class="form-grid">
         <div><label>Exercise Name</label><input type="text" id="ex-name" placeholder="e.g. Push Ups"></div>
         <div><label>Unit</label><input type="text" id="ex-unit" placeholder="e.g. reps, kg, min"></div>
@@ -265,7 +276,21 @@
           </select>
         </div>
       </div>
-      <button class="btn btn-full" onclick="addExercise()">Add Exercise</button>
+      <button class="btn btn-full" id="btn-submit-ex" onclick="addExercise()">Add Exercise</button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Rank Scale</div>
+      <div class="rank-guide">
+        <div class="rg-item"><div class="rank-badge rank-F" style="width:32px;height:32px;font-size:10px;">F</div>&lt;10%</div>
+        <div class="rg-item"><div class="rank-badge rank-D" style="width:32px;height:32px;font-size:10px;">D</div>10–24%</div>
+        <div class="rg-item"><div class="rank-badge rank-C" style="width:32px;height:32px;font-size:10px;">C</div>25–39%</div>
+        <div class="rg-item"><div class="rank-badge rank-B" style="width:32px;height:32px;font-size:10px;">B</div>40–54%</div>
+        <div class="rg-item"><div class="rank-badge rank-A" style="width:32px;height:32px;font-size:10px;">A</div>55–69%</div>
+        <div class="rg-item"><div class="rank-badge rank-S" style="width:32px;height:32px;font-size:10px;">S</div>70–84%</div>
+        <div class="rg-item"><div class="rank-badge rank-SS" style="width:32px;height:32px;font-size:10px;">SS</div>85–99%</div>
+        <div class="rg-item"><div class="rank-badge rank-SSS" style="width:32px;height:32px;font-size:10px;">SSS</div>100%+</div>
+      </div>
     </div>
     
     <div class="panel">
@@ -340,6 +365,12 @@
             <svg class="char-silhouette" viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="60" cy="30" r="18" fill="rgba(200,169,110,0.15)" stroke="rgba(200,169,110,0.3)" stroke-width="1"/>
               <path d="M30 75 L60 65 L90 75 L95 130 L75 130 L70 110 L60 115 L50 110 L45 130 L25 130 Z" fill="rgba(200,169,110,0.1)" stroke="rgba(200,169,110,0.3)" stroke-width="1"/>
+              <rect x="52" y="46" width="16" height="14" fill="rgba(200,169,110,0.1)" stroke="rgba(200,169,110,0.2)" stroke-width="1"/>
+              <path d="M30 75 L10 105 L18 108 L38 82" fill="rgba(200,169,110,0.1)" stroke="rgba(200,169,110,0.3)" stroke-width="1"/>
+              <path d="M90 75 L110 105 L102 108 L82 82" fill="rgba(200,169,110,0.1)" stroke="rgba(200,169,110,0.3)" stroke-width="1"/>
+              <path d="M45 130 L38 170 L52 170 L60 148 L68 170 L82 170 L75 130" fill="rgba(200,169,110,0.08)" stroke="rgba(200,169,110,0.25)" stroke-width="1"/>
+              <line x1="60" y1="65" x2="60" y2="110" stroke="rgba(200,169,110,0.2)" stroke-width="0.5"/>
+              <line x1="42" y1="78" x2="78" y2="78" stroke="rgba(200,169,110,0.15)" stroke-width="0.5"/>
             </svg>
             <div class="char-overall-rank">
               <div class="rank-label">Overall Rank</div>
@@ -426,6 +457,7 @@ const RC = {F:'var(--rank-f)',D:'var(--rank-d)',C:'var(--rank-c)',B:'var(--rank-
 
 const BODY_LABELS = {upper:'Upper Body',lower:'Lower Body',core:'Core',fullbody:'Full Body',cardio:'Cardio'};
 const TYPE_LABELS = {strength:'Strength',endurance:'Endurance',flexibility:'Flexibility',speed:'Speed'};
+const BODY_COLORS = {upper:'var(--upper)',lower:'var(--lower)',core:'var(--core)',fullbody:'var(--fullbody)',cardio:'var(--cardio)'};
 const BODY_PARTS  = ['upper','lower','core','fullbody','cardio'];
 const EX_TYPES    = ['strength','endurance','flexibility','speed'];
 
@@ -435,7 +467,6 @@ function getLevelTitle(lvl) { return CLASS_TITLES[Math.min(lvl-1, CLASS_TITLES.l
 
 function addXP(baseAmount, exercise, reason) {
   let multiplier = 1;
-  // Apply Skill Tree Path Multipliers
   if (state.path === 'titan' && (exercise.type === 'strength' || exercise.body === 'upper')) multiplier = 1.2;
   if (state.path === 'wraith' && (exercise.type === 'speed' || exercise.body === 'cardio')) multiplier = 1.2;
   if (state.path === 'paladin' && (exercise.body === 'core' || exercise.body === 'fullbody')) multiplier = 1.2;
@@ -443,7 +474,6 @@ function addXP(baseAmount, exercise, reason) {
   let finalAmount = Math.round(baseAmount * multiplier);
   state.xp += finalAmount;
   
-  // Level curve: 100xp = Lv2, 400xp = Lv3, 900xp = Lv4 (Level = sqrt(xp/100) + 1)
   let newLevel = Math.floor(Math.sqrt(state.xp / 100)) + 1;
   if (newLevel > state.level) {
     state.level = newLevel;
@@ -465,14 +495,11 @@ function renderHeader() {
 // ── BOSS SYSTEM ────────────────────────────────────
 function manageBoss() {
   const bossEl = document.getElementById('boss-container');
-  
-  // Check if we need to generate a boss (Needs at least 1 exercise with a PB)
   const viableEx = state.exercises.filter(e => e.pb !== null);
   if (viableEx.length === 0) { bossEl.style.display = 'none'; return; }
 
   if (!state.boss) {
     const randomEx = viableEx[Math.floor(Math.random() * viableEx.length)];
-    // Boss target is 5% harder than current PB
     const target = randomEx.direction === 'lower' ? randomEx.pb * 0.95 : randomEx.pb * 1.05;
     state.boss = { exId: randomEx.id, target: parseFloat(target.toFixed(2)) };
     save();
@@ -549,13 +576,91 @@ function importData(event) {
   reader.readAsText(file);
 }
 
-// ── ACHIEVEMENTS (Truncated for brevity, kept structure) ──
+// ── ACHIEVEMENTS FULL SYSTEM ───────────────────────
+function uniqueDays(s){ return new Set(s.logs.map(l=>new Date(l.ts).toDateString())).size; }
+
 const ACHIEVEMENTS = [
-  {id:'first_blood', icon:'⚔️', tier:'bronze', name:'First Blood', desc:'Log your very first session.', check:s=>s.logs.length>=1},
-  {id:'boss_slayer', icon:'👹', tier:'gold', name:'Colossus Slayer', desc:'Defeat your first Boss Target.', check:s=>s.unlockedAchs['boss_slayer'] || false} // Boss ach
+  // Progression
+  {id:'first_blood',   icon:'⚔️',  tier:'bronze', name:'First Blood',      desc:'Log your very first session.', check:s=>s.logs.length>=1},
+  {id:'ten_sessions',  icon:'🔟',  tier:'bronze', name:'Dedicated',        desc:'Log 10 total sessions.', check:s=>s.logs.length>=10, prog:s=>[s.logs.length,10]},
+  {id:'fifty_sessions',icon:'💯',  tier:'silver', name:'Disciplined',      desc:'Log 50 total sessions.', check:s=>s.logs.length>=50, prog:s=>[s.logs.length,50]},
+  {id:'century',       icon:'🏛️', tier:'gold',   name:'Centurion',        desc:'Log 100 total sessions.', check:s=>s.logs.length>=100, prog:s=>[s.logs.length,100]},
+
+  // Rank milestones
+  {id:'rank_b',  icon:'🔵', tier:'bronze', name:'Rising Hunter', desc:'Achieve a B rank on any exercise.', check:s=>s.logs.some(l=>{ const ex=s.exercises.find(e=>e.id===l.exId); return ex&&rankToNum(getRank(getPct(ex,l.val)))>=3; })},
+  {id:'rank_a',  icon:'🟣', tier:'silver', name:'Elite Warrior', desc:'Achieve an A rank on any exercise.', check:s=>s.logs.some(l=>{ const ex=s.exercises.find(e=>e.id===l.exId); return ex&&rankToNum(getRank(getPct(ex,l.val)))>=4; })},
+  {id:'rank_s',  icon:'⭐', tier:'gold',   name:'Sovereign',     desc:'Achieve an S rank on any exercise.', check:s=>s.logs.some(l=>{ const ex=s.exercises.find(e=>e.id===l.exId); return ex&&rankToNum(getRank(getPct(ex,l.val)))>=5; })},
+  {id:'rank_sss',icon:'🔥', tier:'legend', name:'Transcendent',  desc:'Achieve SSS rank — surpass the benchmark.', check:s=>s.logs.some(l=>{ const ex=s.exercises.find(e=>e.id===l.exId); return ex&&getPct(ex,l.val)>=100; })},
+
+  // Boss & PBs
+  {id:'first_pb', icon:'👑', tier:'bronze', name:'Crowned',        desc:'Set your first Personal Best.', check:s=>s.exercises.some(e=>e.pb!==null)},
+  {id:'five_pbs', icon:'🏆', tier:'silver', name:'Record Breaker', desc:'Set a PB on 5 different exercises.', check:s=>s.exercises.filter(e=>e.pb!==null).length>=5, prog:s=>[s.exercises.filter(e=>e.pb!==null).length,5]},
+  {id:'boss_slayer', icon:'👹', tier:'gold', name:'Colossus Slayer', desc:'Defeat your first Boss Target.', check:s=>s.unlockedAchs['boss_slayer'] || false},
+
+  // Diversity
+  {id:'all_body', icon:'🧍', tier:'silver', name:'Balanced Fighter', desc:'Log at least one session in every body region.', check:s=>BODY_PARTS.every(p=>s.exercises.some(e=>e.body===p&&s.logs.some(l=>l.exId===e.id))), prog:s=>[BODY_PARTS.filter(p=>s.exercises.some(e=>e.body===p&&s.logs.some(l=>l.exId===e.id))).length,5]},
+  {id:'all_types',icon:'🎯', tier:'silver', name:'Versatile',        desc:'Log sessions across all 4 exercise types.', check:s=>EX_TYPES.every(t=>s.exercises.some(e=>e.type===t&&s.logs.some(l=>l.exId===e.id))), prog:s=>[EX_TYPES.filter(t=>s.exercises.some(e=>e.type===t&&s.logs.some(l=>l.exId===e.id))).length,4]},
+  {id:'five_ex',  icon:'📋', tier:'bronze', name:'Arsenal',         desc:'Add 5 different exercises.', check:s=>s.exercises.length>=5, prog:s=>[s.exercises.length,5]},
+
+  // Consistency
+  {id:'days_3',  icon:'🗓️', tier:'bronze', name:'On a Roll',  desc:'Log sessions on 3 different calendar days.', check:s=>uniqueDays(s)>=3,  prog:s=>[uniqueDays(s),3]},
+  {id:'days_7',  icon:'🔥', tier:'silver', name:'Iron Will',  desc:'Log sessions on 7 different calendar days.', check:s=>uniqueDays(s)>=7,  prog:s=>[uniqueDays(s),7]},
+  {id:'days_30', icon:'💎', tier:'gold',   name:'Unbroken',   desc:'Log sessions on 30 different calendar days.', check:s=>uniqueDays(s)>=30, prog:s=>[uniqueDays(s),30]},
+
+  // Special
+  {id:'comeback', icon:'🔄', tier:'silver', name:'Comeback', desc:'Beat a previous session after scoring lower the session before.', check:s=>s.exercises.some(ex=>{ const logs=s.logs.filter(l=>l.exId===ex.id).sort((a,b)=>a.ts-b.ts); for(let i=2;i<logs.length;i++){ const better=ex.direction==='lower'?logs[i].val<logs[i-1].val:logs[i].val>logs[i-1].val; const worse =ex.direction==='lower'?logs[i-1].val>logs[i-2].val:logs[i-1].val<logs[i-2].val; if(better&&worse) return true; } return false; })},
+  {id:'overachiever',icon:'🌟',tier:'legend',name:'Overachiever',desc:'Score above 110% of the benchmark on any exercise.', check:s=>s.logs.some(l=>{const ex=s.exercises.find(e=>e.id===l.exId);return ex&&getPct(ex,l.val)>=110;})},
+  {id:'upper_s',   icon:'💪', tier:'gold', name:'Upper Sovereign',  desc:'Achieve S rank or higher on an Upper Body exercise.', check:s=>s.logs.some(l=>{const ex=s.exercises.find(e=>e.id===l.exId);return ex&&ex.body==='upper'&&rankToNum(getRank(getPct(ex,l.val)))>=5;})},
+  {id:'lower_s',   icon:'🦵', tier:'gold', name:'Lower Sovereign',  desc:'Achieve S rank or higher on a Lower Body exercise.', check:s=>s.logs.some(l=>{const ex=s.exercises.find(e=>e.id===l.exId);return ex&&ex.body==='lower'&&rankToNum(getRank(getPct(ex,l.val)))>=5;})},
+  {id:'cardio_s',  icon:'🫀', tier:'gold', name:'Cardio King',      desc:'Achieve S rank or higher on a Cardio exercise.', check:s=>s.logs.some(l=>{const ex=s.exercises.find(e=>e.id===l.exId);return ex&&ex.body==='cardio'&&rankToNum(getRank(getPct(ex,l.val)))>=5;})}
 ];
 
-// ── CORE LOGIC UPDATED ─────────────────────────────
+function checkAchievements(){
+  const nu=[];
+  ACHIEVEMENTS.forEach(a=>{
+    if(!state.unlockedAchs[a.id]&&a.check(state)){
+      state.unlockedAchs[a.id]=Date.now(); nu.push(a);
+    }
+  });
+  if(nu.length){ save(); document.getElementById('ach-notif').classList.add('show'); nu.forEach((a,i)=>setTimeout(()=>showToast(a),i*600)); }
+  return nu;
+}
+
+const TIER_LABELS={bronze:'Bronze',silver:'Silver',gold:'Gold',legend:'Legend'};
+const TIER_ORD={legend:0,gold:1,silver:2,bronze:3};
+
+function renderAchievements(){
+  const grid=document.getElementById('achievements-grid');
+  const countEl=document.getElementById('ach-count');
+  const done=Object.keys(state.unlockedAchs).length;
+  countEl.textContent=`${done} / ${ACHIEVEMENTS.length} unlocked`;
+  const sorted=[...ACHIEVEMENTS].sort((a,b)=>{
+    const au=!!state.unlockedAchs[a.id],bu=!!state.unlockedAchs[b.id];
+    if(au!==bu) return au?-1:1;
+    return TIER_ORD[a.tier]-TIER_ORD[b.tier];
+  });
+  grid.innerHTML=sorted.map(ach=>{
+    const unlocked=!!state.unlockedAchs[ach.id];
+    let progHtml='';
+    if(!unlocked&&ach.prog){
+      const[cur,max]=ach.prog(state); const w=Math.min(100,Math.round((cur/max)*100));
+      progHtml=`<div class="ach-progress"><div class="ach-progress-bar" style="width:${w}%"></div></div><div style="font-size:10px;color:var(--muted);margin-top:4px;">${cur} / ${max}</div>`;
+    }
+    const dateStr=unlocked?`<div class="ach-date">Unlocked ${new Date(state.unlockedAchs[ach.id]).toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'})}</div>`:'';
+    return `
+    <div class="achievement ${unlocked?'unlocked':'locked'}">
+      <span class="ach-tier tier-${ach.tier}">${TIER_LABELS[ach.tier]}</span>
+      <span class="ach-icon">${ach.icon}</span>
+      <div class="ach-info">
+        <div class="ach-name">${ach.name}</div>
+        <div class="ach-desc">${ach.desc}</div>
+        ${dateStr}${progHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── UI / TABS ──────────────────────────────────────
 function switchTab(name, el){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -567,6 +672,151 @@ function switchTab(name, el){
 }
 
 function updatePath() { state.path = document.getElementById('char-path').value; save(); }
+
+// ── EXERCISE MANAGEMENT (ADD, EDIT, DELETE) ────────
+let editingExId = null;
+
+function makeTags(ex){
+  return `<div class="tags">
+    <span class="tag tag-${ex.body}">${BODY_LABELS[ex.body]||ex.body}</span>
+    <span class="tag tag-${ex.type}">${TYPE_LABELS[ex.type]||ex.type}</span>
+  </div>`;
+}
+
+function editExercise(id) {
+  const ex = state.exercises.find(e => e.id === id);
+  if(!ex) return;
+  editingExId = id;
+  
+  document.getElementById('ex-name').value = ex.name;
+  document.getElementById('ex-unit').value = ex.unit;
+  document.getElementById('ex-best').value = ex.best;
+  document.getElementById('ex-direction').value = ex.direction;
+  document.getElementById('ex-body').value = ex.body;
+  document.getElementById('ex-type').value = ex.type;
+  
+  document.getElementById('btn-submit-ex').textContent = "Update Exercise";
+  document.getElementById('btn-submit-ex').style.backgroundColor = "rgba(200,169,110,0.1)";
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function deleteExercise(id) {
+  if(!confirm('Are you sure? This will delete the exercise and ALL its history.')) return;
+  state.exercises = state.exercises.filter(e => e.id !== id);
+  state.logs = state.logs.filter(l => l.exId !== id);
+  if (state.boss && state.boss.exId === id) state.boss = null;
+  save(); 
+  renderExercises(); renderLogView(); renderCharacter(); manageBoss();
+}
+
+function addExercise(){
+  const name=document.getElementById('ex-name').value.trim();
+  const unit=document.getElementById('ex-unit').value.trim()||'reps';
+  const best=parseFloat(document.getElementById('ex-best').value);
+  const direction=document.getElementById('ex-direction').value;
+  const body=document.getElementById('ex-body').value;
+  const type=document.getElementById('ex-type').value;
+  
+  if(!name||isNaN(best)||best<=0) return alert('Please fill in all required fields.');
+
+  if (editingExId) {
+    const exIndex = state.exercises.findIndex(e => e.id === editingExId);
+    if(exIndex > -1) {
+      state.exercises[exIndex] = { ...state.exercises[exIndex], name, unit, best, direction, body, type };
+    }
+    editingExId = null;
+    document.getElementById('btn-submit-ex').textContent = "Add Exercise";
+    document.getElementById('btn-submit-ex').style.backgroundColor = "transparent";
+    showToast({icon:'🛠️', name: 'Exercise Updated'});
+  } else {
+    state.exercises.push({id:Date.now(), name, unit, best, direction, body, type, pb:null});
+    showToast({icon:'➕', name: 'Exercise Added'});
+  }
+  
+  save(); 
+  ['ex-name','ex-unit','ex-best'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ex-direction').value='higher';
+  document.getElementById('ex-body').value='upper';
+  document.getElementById('ex-type').value='strength';
+  
+  checkAchievements(); renderExercises(); renderLogView(); manageBoss();
+}
+
+function renderExercises(){
+  const cont=document.getElementById('exercise-list');
+  const countEl=document.getElementById('ex-count');
+  
+  if(!state.exercises.length){ 
+    cont.innerHTML='<div class="empty-state">No exercises yet. Add one above to begin your ascension.</div>'; 
+    countEl.textContent=''; return;
+  }
+  
+  countEl.textContent=`${state.exercises.length} Active`;
+  
+  cont.innerHTML=state.exercises.map(ex=>{
+    const logs=state.logs.filter(l=>l.exId===ex.id).sort((a,b)=>b.ts-a.ts);
+    const latest=logs[0];
+    const pct = latest ? getPct(ex, latest.val) : null;
+    const rank = pct !== null ? getRank(pct) : null;
+    const dirTag = ex.direction==='lower' ? `<span class="dir-tag dir-down">▼ lower better</span>` : `<span class="dir-tag dir-up">▲ higher better</span>`;
+    const isPBLatest=latest&&ex.pb!==null&&latest.val===ex.pb;
+    
+    return `
+    <div class="exercise-card">
+      ${rank ? `<div class="rank-badge rank-${rank}">${rank}</div>` : `<div class="rank-badge rank-F" style="opacity:.3">?</div>`}
+      <div class="exercise-info">
+        <h3>${ex.name} ${dirTag}</h3>
+        ${makeTags(ex)}
+        <span class="unit" style="margin-top:4px;display:block;">Benchmark: ${ex.best} ${ex.unit}</span>
+        ${latest
+          ?`<div class="pb-label">Last: <span class="pb-value">${latest.val} ${ex.unit}</span>${isPBLatest?' <span class="pb-crown">👑 PB</span>':''}</div>`
+          :'<div class="pb-label" style="color:var(--muted)">No sessions yet</div>'}
+      </div>
+      <div class="exercise-actions" style="display:flex; flex-direction:column; gap:6px;">
+        <button class="btn" style="padding:6px 12px; font-size:9px; border-color:var(--muted); color:var(--muted);" onclick="editExercise(${ex.id})">Edit</button>
+        <button class="btn btn-danger" style="padding:6px 12px; font-size:9px;" onclick="deleteExercise(${ex.id})">Del</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── LOG SESSION ────────────────────────────────────
+function renderLogView(){
+  const sel=document.getElementById('log-exercise');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— Select —</option>'+ state.exercises.map(e=>`<option value="${e.id}" ${e.id==cur?'selected':''}>${e.name}</option>`).join('');
+  if(!document.getElementById('log-date').value) document.getElementById('log-date').value=new Date().toISOString().split('T')[0];
+  renderHistory();
+}
+
+function renderHistory(){
+  const cont=document.getElementById('log-history');
+  const logs=[...state.logs].sort((a,b)=>b.ts-a.ts).slice(0,30);
+  if(!logs.length){cont.innerHTML='<div class="no-logs">No sessions logged yet.</div>';return;}
+  cont.innerHTML=logs.map(l=>{
+    const ex=state.exercises.find(e=>e.id===l.exId);
+    if(!ex) return '';
+    const pct=getPct(ex,l.val); const rank=getRank(pct);
+    const prevLogs=state.logs.filter(x=>x.exId===l.exId&&x.ts<l.ts).sort((a,b)=>b.ts-a.ts);
+    const prev=prevLogs[0]; let vsHtml='';
+    if(prev){
+      const diff=l.val-prev.val;
+      const imp=ex.direction==='lower'?diff<0:diff>0;
+      const wor=ex.direction==='lower'?diff>0:diff<0;
+      vsHtml=`<span class="log-vs ${imp?'log-up':wor?'log-down':'log-same'}">${imp?'▲':wor?'▼':'='} ${Math.abs(diff)} vs prev</span>`;
+    }
+    const date=new Date(l.ts).toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'2-digit'});
+    return `
+    <div class="log-entry">
+      <div class="rank-badge rank-${rank}" style="width:36px;height:36px;font-size:10px;">${rank}</div>
+      <span class="log-date">${date}</span>
+      <strong style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;">${ex.name}</strong>
+      <span class="log-val">${l.val}</span><span class="log-unit"> ${ex.unit}</span>
+      <span style="color:var(--muted);font-size:12px;">${pct}%</span>
+      ${vsHtml}
+    </div>`;
+  }).join('');
+}
 
 function submitLog(){
   const exId=parseInt(document.getElementById('log-exercise').value);
@@ -582,19 +832,17 @@ function submitLog(){
   const isPB=ex.pb===null||(ex.direction==='lower'?val<ex.pb:val>ex.pb);
   if(isPB) ex.pb=val;
 
-  // Boss check
   let bossDefeated = false;
   if (state.boss && state.boss.exId === exId) {
     if ((ex.direction === 'higher' && val >= state.boss.target) || (ex.direction === 'lower' && val <= state.boss.target)) {
       bossDefeated = true;
-      state.boss = null; // Clear boss
+      state.boss = null; 
       state.unlockedAchs['boss_slayer'] = Date.now();
       showToast({icon:'👹', name: 'Colossus Defeated!'});
     }
   }
 
-  // XP Calc
-  let xpGained = addXP(50, ex, "Log"); // Base
+  let xpGained = addXP(50, ex, "Log"); 
   if(isPB) xpGained += addXP(100, ex, "PB");
   if(bossDefeated) xpGained += addXP(500, ex, "Boss");
 
@@ -605,11 +853,12 @@ function submitLog(){
   const prevLogs=state.logs.filter(l=>l.exId===exId&&l.ts<ts).sort((a,b)=>b.ts-a.ts);
   const prev=prevLogs[0];
   
-  showModal(ex,val,pct,rank,isPB,prev,xpGained, bossDefeated);
+  const newlyUnlocked=checkAchievements();
+  showModal(ex,val,pct,rank,isPB,prev,xpGained, bossDefeated, newlyUnlocked);
   renderExercises(); renderHistory(); manageBoss(); updateShadow();
 }
 
-function showModal(ex,val,pct,rank,isPB,prev,xpGained, bossDefeated){
+function showModal(ex,val,pct,rank,isPB,prev,xpGained, bossDefeated, newlyUnlocked){
   document.getElementById('modal-exercise-name').textContent=ex.name;
   document.getElementById('modal-date').textContent=new Date().toLocaleDateString('en-ZA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   
@@ -631,7 +880,12 @@ function showModal(ex,val,pct,rank,isPB,prev,xpGained, bossDefeated){
   
   document.getElementById('modal-xp-gained').textContent = `+${xpGained} XP`;
   
-  // Reset and show Timer
+  const achEl=document.getElementById('modal-new-achs');
+  if(newlyUnlocked && newlyUnlocked.length){
+    achEl.innerHTML=`<div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Feats Unlocked</div>`+
+      newlyUnlocked.map(a=>`<div class="mna-item"><span class="mna-icon">${a.icon}</span><div><div class="mna-name">${a.name}</div><div style="font-size:11px;color:var(--muted);">${a.desc}</div></div></div>`).join('');
+  } else { achEl.innerHTML=''; }
+
   document.getElementById('timer-ui').style.display = 'block';
   document.getElementById('timer-clock').textContent = '01:30';
   document.getElementById('timer-clock').style.color = 'var(--accent)';
@@ -642,6 +896,16 @@ function showModal(ex,val,pct,rank,isPB,prev,xpGained, bossDefeated){
 
 function closeModal(){ document.getElementById('result-modal').classList.remove('open'); clearInterval(timerInterval); }
 
+function showToast(ach){
+  const wrap=document.getElementById('toast-wrap');
+  const el=document.createElement('div'); el.className='toast';
+  el.innerHTML=`<span class="toast-icon">${ach.icon}</span><div class="toast-body"><div class="toast-title">System Alert</div><div class="toast-name">${ach.name}</div></div>`;
+  wrap.appendChild(el);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),500); },3500);
+}
+
+// ── CHARACTER ──────────────────────────────────────
 function renderCharacter(){
   const cont=document.getElementById('char-stats');
   const rankDisp=document.getElementById('char-overall-rank-display');
@@ -649,17 +913,20 @@ function renderCharacter(){
   
   if(!state.exercises.length){
     cont.innerHTML='<div class="empty-state">Log sessions to reveal your stats.</div>';
-    bodySum.innerHTML=''; rankDisp.textContent='—'; rankDisp.style.color='var(--muted)'; return;
+    bodySum.innerHTML=''; rankDisp.textContent='—'; rankDisp.style.color='var(--muted)'; 
+    document.getElementById('stat-golf').textContent = '—';
+    document.getElementById('stat-javelin').textContent = '—';
+    return;
   }
   
   const rows=state.exercises.map(ex=>{
     const logs=state.logs.filter(l=>l.exId===ex.id).sort((a,b)=>b.ts-a.ts);
     const latest=logs[0];
     if(!latest) return {ex,rank:'F',pct:0,latest:null};
-    return {ex,rank:getRank(getPct(ex,latest.val)),pct:getPct(ex,latest.val),latest};
+    const pct=getPct(ex,latest.val);
+    return {ex,rank:getRank(pct),pct,latest};
   });
 
-  // Calculate Specific Athletic Metrics
   const coreRows = rows.filter(r => r.ex.body === 'core');
   const upperRows = rows.filter(r => r.ex.body === 'upper');
   const powerRows = rows.filter(r => r.ex.type === 'speed' || r.ex.type === 'strength');
@@ -670,21 +937,19 @@ function renderCharacter(){
     return numToRank(avgNum);
   };
 
-  // Golf = Core + Upper Strength
   const golfMetric = getAvgRank([...coreRows, ...upperRows]);
   document.getElementById('stat-golf').textContent = golfMetric;
   document.getElementById('stat-golf').style.color = RC[golfMetric] || 'var(--muted)';
 
-  // Javelin = Upper + Power/Speed
   const javMetric = getAvgRank([...upperRows, ...powerRows]);
   document.getElementById('stat-javelin').textContent = javMetric;
   document.getElementById('stat-javelin').style.color = RC[javMetric] || 'var(--muted)';
-
 
   const nums=rows.map(r=>rankToNum(r.rank));
   const avg=nums.reduce((a,b)=>a+b,0)/nums.length;
   const OR=numToRank(avg);
   rankDisp.textContent=OR; rankDisp.style.color=RC[OR];
+  rankDisp.style.textShadow=OR==='SSS'?'var(--glow-sss)':OR==='SS'?'var(--glow-ss)':OR==='S'?'var(--glow-s)':'none';
   
   bodySum.innerHTML=BODY_PARTS.map(bp=>{
     const bpRows=rows.filter(r=>r.ex.body===bp);
@@ -693,46 +958,42 @@ function renderCharacter(){
     const bpRank=numToRank(bpAvg);
     return `<div class="body-card"><div class="bc-label">${BODY_LABELS[bp]}</div><div class="bc-rank" style="color:${RC[bpRank]};">${bpRank}</div></div>`;
   }).filter(Boolean).join('');
-}
 
-// ── STUBS FOR PREVIOUS FUNCTIONS SO IT RUNS ──
-function addExercise(){
-  const name=document.getElementById('ex-name').value.trim();
-  const unit=document.getElementById('ex-unit').value.trim()||'reps';
-  const best=parseFloat(document.getElementById('ex-best').value);
-  if(!name||isNaN(best)||best<=0) return;
-  state.exercises.push({id:Date.now(),name,unit,best,direction:document.getElementById('ex-direction').value,body:document.getElementById('ex-body').value,type:document.getElementById('ex-type').value,pb:null});
-  save(); renderExercises(); manageBoss();
+  const groups={};
+  rows.forEach(r=>{ const bp=r.ex.body||'upper'; if(!groups[bp])groups[bp]=[]; groups[bp].push(r); });
+  let html='';
+  BODY_PARTS.forEach(bp=>{
+    if(!groups[bp]) return;
+    html+=`<div class="stat-group-header" style="color:${BODY_COLORS[bp]};">${BODY_LABELS[bp]}</div>`;
+    html+=groups[bp].map(r=>{
+      const barW=Math.min(100,r.pct); const color=RC[r.rank];
+      return `
+      <div class="stat-row">
+        <div class="rank-badge rank-${r.rank}" style="width:38px;height:38px;font-size:10px;">${r.rank}</div>
+        <div>
+          <div class="stat-name">${r.ex.name}</div>
+          <div class="tags" style="margin-top:2px;"><span class="tag tag-${r.ex.type}" style="font-size:9px;padding:1px 5px;">${TYPE_LABELS[r.ex.type]}</span></div>
+          <div class="stat-bar-wrap" style="margin-top:4px;"><div class="stat-bar" style="width:${barW}%;background:${color};"></div></div>
+        </div>
+        <div class="stat-val" style="color:${color};">${r.latest?r.latest.val:'—'}<span style="font-size:9px;color:var(--muted);"> ${r.ex.unit}</span></div>
+        <div class="stat-pb">Best ${r.ex.best}<br><span style="font-size:9px;">${r.pct}% ${r.ex.direction==='lower'?'▼':'▲'}</span></div>
+      </div>`;
+    }).join('');
+  });
+  cont.innerHTML=html;
 }
-function renderExercises(){
-  const cont=document.getElementById('exercise-list');
-  if(!state.exercises.length){ cont.innerHTML='<div class="empty-state">No exercises yet.</div>'; return;}
-  cont.innerHTML=state.exercises.map(ex=>`<div class="exercise-card"><div class="exercise-info"><h3>${ex.name}</h3><span class="unit">Best: ${ex.best} ${ex.unit}</span></div></div>`).join('');
-}
-function renderLogView(){
-  const sel=document.getElementById('log-exercise');
-  sel.innerHTML='<option value="">— Select —</option>'+ state.exercises.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
-  if(!document.getElementById('log-date').value) document.getElementById('log-date').value=new Date().toISOString().split('T')[0];
-  renderHistory();
-}
-function renderHistory(){
-  document.getElementById('log-history').innerHTML=state.logs.slice(0,10).map(l=>{
-    const ex=state.exercises.find(e=>e.id===l.exId);
-    return ex ? `<div class="log-entry"><strong>${ex.name}</strong>: ${l.val} ${ex.unit}</div>` : '';
-  }).join('');
-}
-function renderAchievements(){ document.getElementById('achievements-grid').innerHTML = '<div class="empty-state">Feats logic running in background.</div>'; }
-function showToast(ach){ /* stub */ }
 
 // ── INIT ───────────────────────────────────────────
+checkAchievements();
 renderHeader();
 manageBoss();
 renderExercises();
 renderLogView();
 renderCharacter();
+renderAchievements();
 </script>
+
 <script>
-  // Register Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js')
