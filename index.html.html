@@ -245,68 +245,62 @@ function playSound(t){
 
 // --- STATE & SEED DATA ---
 const SEED_EXERCISES = [
-    // GOLF PERFORMANCE (8.2 Handicap Focus)
-    {name: "Golf Swing Rotation (Cable)", unit: "kg", best: 60, body: "core", type: "speed", direction: "higher"},
-    {name: "Medicine Ball Rotational Slam", unit: "kg", best: 15, body: "core", type: "speed", direction: "higher"},
-    {name: "Single-Leg Romanian Deadlift", unit: "kg", best: 100, body: "lower", type: "strength", direction: "higher"},
-    {name: "Clubhead Speed Potential", unit: "reps", best: 125, body: "upper", type: "speed", direction: "higher"},
-    
-    // JAVELIN LEGACY (Power & Explosion)
-    {name: "Overhead Javelin Throw (Weight)", unit: "kg", best: 10, body: "upper", type: "speed", direction: "higher"},
-    {name: "Medicine Ball Chest Pass", unit: "reps", best: 50, body: "upper", type: "speed", direction: "higher"},
-    {name: "Explosive Step Up", unit: "kg", best: 80, body: "lower", type: "speed", direction: "higher"},
-    {name: "National Tier Sprint (30m)", unit: "minutes", best: 0.065, body: "cardio", type: "speed", direction: "lower"}, // 3.9 seconds
+    // --- UPPER BODY: STRENGTH & POWER ---
+    {name: "Pull-Ups (Vest: 20kg)", unit: "reps", best: 15, body: "upper", type: "strength", direction: "higher"},
+    {name: "Diamond Push-Ups (Vest: 20kg)", unit: "reps", best: 35, body: "upper", type: "strength", direction: "higher"},
+    {name: "Chin-Ups (Max Reps)", unit: "reps", best: 30, body: "upper", type: "endurance", direction: "higher"},
+    {name: "Floor Press (Barbell: 36kg)", unit: "reps", best: 50, body: "upper", type: "strength", direction: "higher"},
+    {name: "Overhead Press (Barbell: 36kg)", unit: "reps", best: 25, body: "upper", type: "strength", direction: "higher"},
+    {name: "Dumbbell Row (Dumbbell: 18kg)", unit: "reps", best: 40, body: "upper", type: "strength", direction: "higher"},
+    {name: "Archer Push-Ups", unit: "reps", best: 20, body: "upper", type: "strength", direction: "higher"},
+    {name: "Pseudo-Planche Push-Ups", unit: "reps", best: 15, body: "upper", type: "strength", direction: "higher"},
+    {name: "Handstand Push-Ups (Against Wall)", unit: "reps", best: 12, body: "upper", type: "strength", direction: "higher"},
+    {name: "Lateral Raises (Dumbbell: 18kg)", unit: "reps", best: 15, body: "upper", type: "strength", direction: "higher"},
+    {name: "Resistance Band Face Pulls", unit: "reps", best: 60, body: "upper", type: "endurance", direction: "higher"},
+    {name: "Bicep Curls (Barbell: 36kg)", unit: "reps", best: 20, body: "upper", type: "strength", direction: "higher"},
 
-    // UPPER BODY STRENGTH
-    {name: "Bench Press", unit: "kg", best: 140, body: "upper", type: "strength", direction: "higher"},
-    {name: "Overhead Press", unit: "kg", best: 90, body: "upper", type: "strength", direction: "higher"},
-    {name: "Pull Ups (Weighted)", unit: "kg", best: 40, body: "upper", type: "strength", direction: "higher"},
-    {name: "Incline Dumbbell Press", unit: "kg", best: 50, body: "upper", type: "strength", direction: "higher"},
-    {name: "Dips (Weighted)", unit: "kg", best: 60, body: "upper", type: "strength", direction: "higher"},
-    {name: "Barbell Row", unit: "kg", best: 120, body: "upper", type: "strength", direction: "higher"},
-    {name: "Lat Pulldown", unit: "kg", best: 110, body: "upper", type: "strength", direction: "higher"},
-    {name: "Face Pulls", unit: "reps", best: 100, body: "upper", type: "strength", direction: "higher"},
-    {name: "Hammer Curls", unit: "kg", best: 30, body: "upper", type: "strength", direction: "higher"},
-    {name: "Lateral Raises", unit: "kg", best: 20, body: "upper", type: "strength", direction: "higher"},
+    // --- LOWER BODY: STRENGTH & POWER ---
+    {name: "Pistol Squats (Single Leg)", unit: "reps", best: 20, body: "lower", type: "strength", direction: "higher"},
+    {name: "Walking Lunges (Vest + 2x18kg DB)", unit: "reps", best: 40, body: "lower", type: "strength", direction: "higher"},
+    {name: "Bulgarian Split Squat (Vest: 20kg)", unit: "reps", best: 30, body: "lower", type: "strength", direction: "higher"},
+    {name: "Goblet Squat (Dumbbell: 18kg)", unit: "reps", best: 60, body: "lower", type: "endurance", direction: "higher"},
+    {name: "Barbell Squat (Max Speed - 36kg)", unit: "reps", best: 50, body: "lower", type: "speed", direction: "higher"},
+    {name: "Broad Jump (Standing)", unit: "minutes", best: 0.05, body: "lower", type: "speed", direction: "higher"}, // Stored as decimal (3m jump)
+    {name: "Box Jumps (Max Height)", unit: "reps", best: 40, body: "lower", type: "speed", direction: "higher"},
+    {name: "Glute Bridge (Barbell: 36kg)", unit: "reps", best: 100, body: "lower", type: "endurance", direction: "higher"},
+    {name: "Single Leg Calf Raises (Vest: 20kg)", unit: "reps", best: 30, body: "lower", type: "strength", direction: "higher"},
+    {name: "Resistance Band Leg Curls", unit: "reps", best: 50, body: "lower", type: "endurance", direction: "higher"},
 
-    // LOWER BODY STRENGTH
-    {name: "Back Squat", unit: "kg", best: 200, body: "lower", type: "strength", direction: "higher"},
-    {name: "Deadlift (Conventional)", unit: "kg", best: 240, body: "lower", type: "strength", direction: "higher"},
-    {name: "Front Squat", unit: "kg", best: 140, body: "lower", type: "strength", direction: "higher"},
-    {name: "Leg Press", unit: "kg", best: 450, body: "lower", type: "strength", direction: "higher"},
-    {name: "Bulgarian Split Squat", unit: "kg", best: 80, body: "lower", type: "strength", direction: "higher"},
-    {name: "Calf Raises (Standing)", unit: "kg", best: 150, body: "lower", type: "strength", direction: "higher"},
-    {name: "Glute Ham Raise", unit: "reps", best: 30, body: "lower", type: "strength", direction: "higher"},
-    {name: "Hack Squat", unit: "kg", best: 180, body: "lower", type: "strength", direction: "higher"},
-    {name: "Hip Thrust", unit: "kg", best: 220, body: "lower", type: "strength", direction: "higher"},
+    // --- CORE & STABILITY ---
+    {name: "Hanging Leg Raises (Strict)", unit: "reps", best: 25, body: "core", type: "strength", direction: "higher"},
+    {name: "L-Sit Hold", unit: "minutes", best: 1, body: "core", type: "strength", direction: "higher"},
+    {name: "Weighted Plank (Vest: 20kg)", unit: "minutes", best: 5, body: "core", type: "endurance", direction: "higher"},
+    {name: "Hollow Body Rock", unit: "reps", best: 100, body: "core", type: "endurance", direction: "higher"},
+    {name: "Dragon Flag Negatives", unit: "reps", best: 10, body: "core", type: "strength", direction: "higher"},
+    {name: "Russian Twists (Vest: 20kg)", unit: "reps", best: 80, body: "core", type: "endurance", direction: "higher"},
+    {name: "Dead Bug (Slow Tempo)", unit: "reps", best: 50, body: "core", type: "endurance", direction: "higher"},
 
-    // CORE & STABILITY
-    {name: "Ab Wheel Rollouts", unit: "reps", best: 50, body: "core", type: "strength", direction: "higher"},
-    {name: "Plank Duration", unit: "minutes", best: 10, body: "core", type: "endurance", direction: "higher"},
-    {name: "Hanging Leg Raises", unit: "reps", best: 40, body: "core", type: "strength", direction: "higher"},
-    {name: "Russian Twists (Weighted)", unit: "reps", best: 100, body: "core", type: "strength", direction: "higher"},
-    {name: "Woodchoppers", unit: "kg", best: 50, body: "core", type: "speed", direction: "higher"},
-    {name: "Dragon Flag", unit: "reps", best: 15, body: "core", type: "strength", direction: "higher"},
-    {name: "Pallof Press", unit: "kg", best: 40, body: "core", type: "strength", direction: "higher"},
+    // --- CARDIO & PERFORMANCE ---
+    {name: "5km Run (High Altitude)", unit: "minutes", best: 19, body: "cardio", type: "endurance", direction: "lower"},
+    {name: "100m Sprint (Full Power)", unit: "minutes", best: 0.19, body: "cardio", type: "speed", direction: "lower"}, // 11.5s
+    {name: "Burpees (Max in 5 mins)", unit: "reps", best: 100, body: "cardio", type: "speed", direction: "higher"},
+    {name: "Mountain Climbers (2 Mins)", unit: "reps", best: 250, body: "cardio", type: "speed", direction: "higher"},
+    {name: "Shadow Boxing (High Intensity)", unit: "minutes", best: 15, body: "cardio", type: "endurance", direction: "higher"},
+    {name: "Jump Rope (Double Unders)", unit: "reps", best: 50, body: "cardio", type: "speed", direction: "higher"},
 
-    // CARDIO & CONDITIONING
-    {name: "5km Run", unit: "minutes", best: 18, body: "cardio", type: "endurance", direction: "lower"},
-    {name: "10km Run", unit: "minutes", best: 40, body: "cardio", type: "endurance", direction: "lower"},
-    {name: "Sprint Intervals (400m)", unit: "minutes", best: 1, body: "cardio", type: "speed", direction: "lower"},
-    {name: "Rowing Machine (2k)", unit: "minutes", best: 6.5, body: "cardio", type: "endurance", direction: "lower"},
-    {name: "Assault Bike (Calorie Sprint)", unit: "reps", best: 100, body: "cardio", type: "speed", direction: "higher"},
-    {name: "Burpees (Max in 1 min)", unit: "reps", best: 35, body: "cardio", type: "speed", direction: "higher"},
-    {name: "Jump Rope (Consecutive)", unit: "reps", best: 500, body: "cardio", type: "endurance", direction: "higher"},
-    {name: "Swimming (500m)", unit: "minutes", best: 7, body: "cardio", type: "endurance", direction: "lower"},
+    // --- GOLF SPECIFIC (ROTATION & EXPLOSION) ---
+    {name: "Band Assisted Swing Speed", unit: "reps", best: 130, body: "core", type: "speed", direction: "higher"},
+    {name: "Rotational Band Slams", unit: "reps", best: 60, body: "core", type: "speed", direction: "higher"},
+    {name: "Overhead Barbell Reverse Lunge", unit: "reps", best: 20, body: "lower", type: "strength", direction: "higher"},
+    {name: "Cossack Squats (Vest: 20kg)", unit: "reps", best: 24, body: "lower", type: "strength", direction: "higher"},
+    {name: "Wrist Rollers (Forearm Power)", unit: "reps", best: 10, body: "upper", type: "strength", direction: "higher"},
 
-    // FUNCTIONAL & METCON
-    {name: "Farmer's Walk (Distance)", unit: "kg", best: 150, body: "fullbody", type: "strength", direction: "higher"},
-    {name: "Clean & Jerk", unit: "kg", best: 120, body: "fullbody", type: "strength", direction: "higher"},
-    {name: "Snatch", unit: "kg", best: 100, body: "fullbody", type: "strength", direction: "higher"},
-    {name: "Kettlebell Swings", unit: "reps", best: 200, body: "fullbody", type: "endurance", direction: "higher"},
-    {name: "Wall Balls", unit: "reps", best: 150, body: "fullbody", type: "endurance", direction: "higher"},
-    {name: "Sandbag Carry", unit: "minutes", best: 15, body: "fullbody", type: "endurance", direction: "higher"},
-    {name: "Box Jumps", unit: "reps", best: 100, body: "lower", type: "speed", direction: "higher"}
+    // --- JAVELIN LEGACY (PEAK PERFORMANCE) ---
+    {name: "Overhead Vest Throw (For Distance)", unit: "reps", best: 20, body: "upper", type: "speed", direction: "higher"},
+    {name: "Single Arm Band Pulls (Fast)", unit: "reps", best: 100, body: "upper", type: "speed", direction: "higher"},
+    {name: "Plyometric Push-Ups", unit: "reps", best: 30, body: "upper", type: "speed", direction: "higher"},
+    {name: "Tuck Jumps (Max Reps in 1m)", unit: "reps", best: 60, body: "lower", type: "speed", direction: "higher"},
+    {name: "Vertical Jump (Peak Height)", unit: "minutes", best: 0.015, body: "lower", type: "speed", direction: "higher"} // ~0.9m
 ];
 
 let state = JSON.parse(localStorage.getItem('sovereign_vfinal') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"path":"none","boss":null,"protocols":[]}');
