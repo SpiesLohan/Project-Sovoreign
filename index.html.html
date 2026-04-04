@@ -13,6 +13,8 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
   :root {
     --bg:#070710; --bg2:#0d0d1a; --bg3:#12122a;
@@ -20,31 +22,26 @@
     --accent:#c8a96e; --accent2:#7b5ea7; --text:#e8e0d0; --muted:#6b6a7a;
     --rank-f:#555; --rank-d:#7a4f2a; --rank-c:#2e6b3e; --rank-b:#1a5f8a;
     --rank-a:#6a2ea0; --rank-s:#c8a92e; --rank-ss:#e07830; --rank-sss:#cc2040;
-    --glow-s:0 0 20px rgba(200,169,46,0.6),0 0 60px rgba(200,169,46,0.2);
-    --glow-ss:0 0 20px rgba(224,120,48,0.7),0 0 60px rgba(224,120,48,0.3);
-    --glow-sss:0 0 25px rgba(204,32,64,0.8),0 0 80px rgba(204,32,64,0.4);
-    --upper:#5a9fc8; --lower:#6ab87a; --core:#c8a96e; --fullbody:#a07ec8; --cardio:#e07878;
-    --strength:#e8a050; --endurance:#50b8e8; --flexibility:#98c878; --speed:#e870a8;
+    --glow-s:0 0 20px rgba(200,169,46,0.6);
+    --glow-sss:0 0 25px rgba(204,32,64,0.8);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent;}
   body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 20% 0%,rgba(123,94,167,0.08) 0%,transparent 70%),radial-gradient(ellipse 50% 30% at 80% 100%,rgba(200,169,110,0.06) 0%,transparent 70%);pointer-events:none;z-index:0;}
-  .noise{position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4;}
   .app{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 20px 80px;}
 
   header{text-align:center;padding:48px 0 32px;border-bottom:1px solid var(--border);margin-bottom:40px;}
-  .logo-subtitle{font-family:'Cinzel',serif;font-size:11px;letter-spacing:8px;color:var(--accent);text-transform:uppercase;margin-bottom:12px;opacity:.8;}
-  h1{font-family:'Cinzel Decorative',serif;font-size:clamp(28px,5vw,52px);font-weight:900;background:linear-gradient(135deg,#e8d9b0 0%,#c8a96e 40%,#8b6d3a 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px;line-height:1.1;}
+  .logo-subtitle{font-family:'Cinzel',serif;font-size:11px;letter-spacing:8px;color:var(--accent);text-transform:uppercase;margin-bottom:12px;}
+  h1{font-family:'Cinzel Decorative',serif;font-size:clamp(28px,5vw,52px);font-weight:900;background:linear-gradient(135deg,#e8d9b0 0%,#c8a96e 40%,#8b6d3a 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px; cursor: pointer;}
   
   .xp-container {max-width: 400px; margin: 20px auto 0; text-align: center;}
   .level-text {font-family:'Cinzel',serif; font-size:12px; letter-spacing:2px; color:var(--accent); margin-bottom:6px; text-transform:uppercase;}
   .xp-bar-bg {height:4px; background:rgba(255,255,255,0.05); border-radius:2px; overflow:hidden;}
   .xp-bar-fill {height:100%; background:linear-gradient(90deg, var(--accent2), var(--accent)); transition:width 0.5s ease-out;}
   .xp-text {font-size:10px; color:var(--muted); margin-top:6px; letter-spacing:1px;}
-  .header-divider{width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:24px auto 0;}
 
-  .tabs{display:flex;gap:4px;margin-bottom:32px;background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:4px;flex-wrap:nowrap;overflow-x:auto;}
-  .tab{flex:1;padding:10px 4px;background:none;border:1px solid transparent;color:var(--muted);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;border-radius:1px;position:relative;white-space:nowrap;}
+  .tabs{display:flex;gap:4px;margin-bottom:32px;background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:4px;overflow-x:auto;}
+  .tab{flex:1;padding:10px 4px;background:none;border:1px solid transparent;color:var(--muted);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;white-space:nowrap;}
   .tab.active{background:rgba(200,169,110,0.1);color:var(--accent);border:1px solid rgba(200,169,110,0.2);}
   .view{display:none;} .view.active{display:block;}
 
@@ -55,89 +52,73 @@
   .boss-panel {border-color: rgba(204,32,64,0.4); background: radial-gradient(circle at top right, rgba(204,32,64,0.05), transparent);}
   .boss-title {color: var(--rank-sss); text-shadow: var(--glow-sss);}
   .boss-target {font-size: 24px; font-weight: 700; color: #fff;}
-  
+
   .shadow-wrap {margin-top: 10px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px dashed var(--muted); border-radius: 2px; display: none;}
   .shadow-wrap.active {display: flex; justify-content: space-between; align-items: center;}
+  
   .timer-wrap {margin-top: 16px; text-align: center; display: none;}
   .timer-display {font-family:'Cinzel Decorative',serif; font-size: 32px; font-weight: 900; color: var(--accent); margin: 10px 0;}
-  
+
   .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:16px;}
   label{display:block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-family:'Cinzel',serif;}
-  input,select{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:2px;color:var(--text);padding:10px 14px;font-family:'Rajdhani',sans-serif;font-size:15px;outline:none;transition:border-color .2s;}
+  input,select{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:2px;color:var(--text);padding:10px 14px;font-family:'Rajdhani',sans-serif;font-size:15px;outline:none;}
 
-  .btn{padding:11px 28px;background:none;border:1px solid var(--accent);color:var(--accent);font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .2s;white-space:nowrap;}
-  .btn:hover{background:rgba(200,169,110,0.1);}
+  .btn{padding:11px 28px;background:none;border:1px solid var(--accent);color:var(--accent);font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;}
   .btn-danger{border-color:#cc3344;color:#cc3344;}
   .btn-full{width:100%;margin-top:16px;}
+  .btn-small { padding: 6px 0; font-size: 9px; width: 100%; text-align: center; }
 
-  /* EXERCISE CARDS */
+  /* EXERCISE LAYOUT 15/85 */
   .exercise-list{display:flex;flex-direction:column;gap:12px;}
   .exercise-card{
     background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:2px; padding:14px 18px;
     display:grid; grid-template-columns: 1fr 15%; gap:16px; align-items:center;
   }
-  .exercise-info h3{
-    font-family:'Cinzel',serif; font-size:13px; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px;
-    white-space: normal; word-break: break-word; line-height: 1.3;
-  }
+  .exercise-info h3{ font-family:'Cinzel',serif; font-size:13px; text-transform:uppercase; white-space: normal; word-break: break-word; }
   .exercise-actions{ display:flex; flex-direction:column; gap:6px; align-items: flex-end; }
-  .btn-small { padding: 6px 0; font-size: 9px; width: 100%; text-align: center; }
+  .history-link { font-size: 9px; color: var(--accent); text-decoration: underline; cursor: pointer; margin-top: 4px; display: inline-block;}
 
-  /* LOG ENTRY */
   .log-entry{
     display:grid; grid-template-columns: auto 1fr auto auto; align-items:center; gap:14px; padding:10px 14px;
-    background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:2px; margin-bottom:8px; font-size:14px;
+    background:rgba(255,255,255,0.02); border:1px solid var(--border); margin-bottom:8px; font-size:14px;
   }
-  .log-date{color:var(--muted); font-size:11px; width:45px;}
-  .log-name{font-family:'Cinzel',serif; font-size:11px; letter-spacing:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
-  /* RANKS */
-  .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:14px;border-radius:2px;border:2px solid;flex-shrink:0;}
-  .rank-F  {color:var(--rank-f); border-color:var(--rank-f); background:rgba(85,85,85,0.1);}
-  .rank-S  {color:var(--rank-s); border-color:var(--rank-s); background:rgba(200,169,46,0.1);box-shadow:var(--glow-s);}
-  .rank-SSS{color:var(--rank-sss);border-color:var(--rank-sss);background:rgba(204,32,64,0.1);box-shadow:var(--glow-sss);animation:pulse-sss 2s ease-in-out infinite;}
+  .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:12px;border-radius:2px;border:2px solid;}
+  .rank-SSS{box-shadow:var(--glow-sss); animation: pulse-sss 2s infinite;}
+  @keyframes pulse-sss { 0%,100% {opacity:1;} 50% {opacity:0.7;} }
 
-  .body-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px;}
-  .body-card .bc-rank{font-family:'Cinzel Decorative',serif;font-size:22px;font-weight:900;}
-
-  /* ACHIEVEMENTS */
+  .radar-wrap { width: 100%; max-width: 400px; margin: 0 auto; }
   .achievements-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
-  .achievement{
-    background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:2px; 
-    padding:18px; display:flex; gap:16px; align-items:flex-start; position:relative; cursor: pointer;
-  }
-  .achievement.unlocked{border-color:rgba(200,169,110,0.3);background:rgba(200,169,110,0.04);}
-  .achievement.locked{opacity:.4;filter:grayscale(0.7);}
-  .ach-icon{font-size:30px;line-height:1;}
+  .achievement{ background:rgba(255,255,255,0.02); border:1px solid var(--border); padding:18px; display:flex; gap:16px; cursor: pointer;}
+  .achievement.unlocked{border-color:var(--accent); background:rgba(200,169,110,0.05);}
+  .achievement.locked{opacity:0.4; filter:grayscale(1);}
 
-  .toast-wrap{position:fixed;bottom:30px;right:30px;z-index:200;display:flex;flex-direction:column;gap:10px;pointer-events:none;}
-  .toast{background:#0d0d1a;border:1px solid rgba(200,169,110,0.5);border-radius:2px;padding:14px 18px;display:flex;gap:14px;align-items:center;min-width:280px;transform:translateX(120%);transition:transform .4s;}
-  .toast.show{transform:translateX(0);}
+  .protocol-card { border: 1px solid var(--accent2); background: rgba(123, 94, 167, 0.05); padding: 15px; margin-bottom: 10px; cursor: pointer; }
+
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .2s;}
   .modal-overlay.open{opacity:1;pointer-events:all;}
-  .modal{background:#0d0d1a;border:1px solid rgba(200,169,110,0.3);border-radius:2px;padding:32px;width:100%;max-width:440px;margin:20px;}
+  .modal{background:#0d0d1a;border:1px solid var(--accent);padding:32px;width:100%;max-width:440px;margin:20px;max-height:90vh;overflow-y:auto;}
+  .chart-container { height: 250px; width: 100%; }
 </style>
 </head>
 <body>
-<div class="noise"></div>
 <div class="app">
-
   <header>
     <div class="logo-subtitle">// Ascension Protocol //</div>
-    <h1>SOVEREIGN</h1>
+    <h1 onclick="playSound('powerUp')">SOVEREIGN</h1>
     <div class="xp-container">
       <div class="level-text" id="header-level">Level 1 Novice</div>
       <div class="xp-bar-bg"><div class="xp-bar-fill" id="header-xp-fill" style="width: 0%;"></div></div>
       <div class="xp-text" id="header-xp-text">0 / 100 XP</div>
     </div>
-    <div class="header-divider"></div>
   </header>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('exercises',this)">Exercises</button>
-    <button class="tab" onclick="switchTab('log',this)">Log Session</button>
+    <button class="tab active" onclick="switchTab('exercises',this)">Arsenal</button>
+    <button class="tab" onclick="switchTab('protocols',this)">Protocols</button>
+    <button class="tab" onclick="switchTab('log',this)">Log</button>
     <button class="tab" onclick="switchTab('character',this)">Character</button>
-    <button class="tab" onclick="switchTab('achievements',this)">Feats <span class="notif" id="ach-notif"></span></button>
+    <button class="tab" onclick="switchTab('achievements',this)">Feats</button>
   </div>
 
   <div class="view active" id="view-exercises">
@@ -146,352 +127,337 @@
       <div id="boss-details"></div>
     </div>
     <div class="panel">
-      <div class="panel-title">Manage Exercise</div>
+      <div class="panel-title">Add Exercise</div>
       <div class="form-grid">
-        <div><label>Name</label><input type="text" id="ex-name" placeholder="e.g. Bench Press"></div>
-        <div><label>Unit</label>
-          <select id="ex-unit" onchange="updateExInputUI()">
-            <option value="reps">Reps</option>
-            <option value="kg">kg</option>
-            <option value="lbs">lbs</option>
-            <option value="minutes">Time (M:S)</option>
-            <option value="km">km</option>
-          </select>
+        <input type="text" id="ex-name" placeholder="Exercise Name">
+        <select id="ex-unit" onchange="updateExInputUI()">
+            <option value="reps">Reps</option><option value="kg">kg</option><option value="minutes">Time (M:S)</option>
+        </select>
+        <div id="ex-best-standard-wrap"><input type="number" id="ex-best" placeholder="World Best"></div>
+        <div id="ex-best-time-wrap" style="display:none; gap:8px; display:flex;">
+          <input type="number" id="ex-best-min" placeholder="Min" style="flex:1;"><input type="number" id="ex-best-sec" placeholder="Sec" style="flex:1;">
         </div>
-        <div><label>Benchmark</label>
-          <div id="ex-best-standard-wrap"><input type="number" id="ex-best" step="any"></div>
-          <div id="ex-best-time-wrap" style="display:none; gap:8px; display:flex;">
-            <input type="number" id="ex-best-min" placeholder="Min" min="0">
-            <span style="color:var(--muted)">:</span>
-            <input type="number" id="ex-best-sec" placeholder="Sec" min="0" max="59">
-          </div>
-        </div>
-        <div><label>Scoring</label>
-          <select id="ex-direction">
-            <option value="higher">Higher Better</option>
-            <option value="lower">Lower Better</option>
-          </select>
-        </div>
-        <div><label>Region</label>
-          <select id="ex-body">
-            <option value="upper">Upper Body</option>
-            <option value="lower">Lower Body</option>
-            <option value="core">Core</option>
-            <option value="fullbody">Full Body</option>
-            <option value="cardio">Cardio</option>
-          </select>
-        </div>
-        <div><label>Type</label>
-          <select id="ex-type">
-            <option value="strength">Strength</option>
-            <option value="endurance">Endurance</option>
-            <option value="speed">Speed</option>
-          </select>
-        </div>
+        <select id="ex-direction"><option value="higher">Higher Better</option><option value="lower">Lower Better</option></select>
+        <select id="ex-body"><option value="upper">Upper</option><option value="lower">Lower</option><option value="core">Core</option><option value="cardio">Cardio</option></select>
+        <select id="ex-type"><option value="strength">Strength</option><option value="speed">Speed</option></select>
       </div>
-      <button class="btn btn-full" id="btn-submit-ex" onclick="addExercise()">Add Exercise</button>
+      <button class="btn btn-full" id="btn-submit-ex" onclick="addExercise()">Add to Arsenal</button>
     </div>
+    <div id="exercise-list" class="exercise-list"></div>
+  </div>
+
+  <div class="view" id="view-protocols">
     <div class="panel">
-      <div class="panel-title">Your Arsenal <span class="section-count" id="ex-count"></span></div>
-      <div id="exercise-list" class="exercise-list"></div>
+      <div class="panel-title">Create Protocol</div>
+      <input type="text" id="proto-name" placeholder="e.g. Leg Day">
+      <div id="proto-selector" style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:5px;"></div>
+      <button class="btn btn-full" onclick="createProtocol()">Initialize Protocol</button>
     </div>
+    <div id="protocol-list"></div>
   </div>
 
   <div class="view" id="view-log">
     <div class="panel">
-      <div class="panel-title">Log Performance</div>
-      <div class="form-grid">
-        <div><label>Exercise</label><select id="log-exercise" onchange="updateLogInputUI()"></select></div>
-        <div><label>Performance</label>
-          <div id="log-amount-standard-wrap"><input type="number" id="log-amount" step="any"></div>
-          <div id="log-amount-time-wrap" style="display:none; gap:8px; display:flex;">
-            <input type="number" id="log-amount-min" placeholder="Min">
-            <span style="color:var(--muted)">:</span>
-            <input type="number" id="log-amount-sec" placeholder="Sec">
-          </div>
+      <div class="panel-title">Capture Performance</div>
+      <div id="proto-notice" style="display:none; color:var(--accent2); font-size:10px; margin-bottom:5px;">// PROTOCOL ACTIVE //</div>
+      <select id="log-exercise" onchange="updateLogInputUI()"></select>
+      <div class="form-grid" style="margin-top:10px;">
+        <div id="log-amount-standard-wrap"><input type="number" id="log-amount" placeholder="Result"></div>
+        <div id="log-amount-time-wrap" style="display:none; gap:8px; display:flex;">
+          <input type="number" id="log-amount-min" placeholder="Min"><input type="number" id="log-amount-sec" placeholder="Sec">
         </div>
-        <div><label>Date</label><input type="date" id="log-date"></div>
+        <input type="date" id="log-date">
       </div>
       <div class="shadow-wrap" id="shadow-display">
-        <div class="shadow-title">Shadow (Prev PB)</div>
-        <div class="shadow-value" id="shadow-val">—</div>
+        <div style="font-size:10px; color:var(--muted)">SHADOW (PB)</div>
+        <div id="shadow-val" style="font-weight:700; color:var(--accent)">—</div>
       </div>
       <button class="btn btn-full" onclick="submitLog()">Record Log</button>
     </div>
-    <div class="panel"><div class="panel-title">History</div><div id="log-history"></div></div>
+    <div id="log-history"></div>
   </div>
 
   <div class="view" id="view-character">
     <div class="panel">
-      <div class="panel-title">Skill Tree</div>
-      <select id="char-path" onchange="updatePath()">
-        <option value="none">Unaligned</option>
-        <option value="titan">Titan (Strength Focus)</option>
-        <option value="wraith">Wraith (Speed Focus)</option>
-        <option value="paladin">Paladin (Balanced Focus)</option>
-      </select>
+        <div class="panel-title">Athletic Pentagram</div>
+        <div class="radar-wrap"><canvas id="radarChart"></canvas></div>
     </div>
     <div class="panel">
-        <div class="panel-title">Athletic Lineage</div>
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
-            <div class="metric-card">🏌️ Golf: <span id="stat-golf" style="color:var(--accent)">—</span></div>
-            <div class="metric-card">🎯 Javelin: <span id="stat-javelin" style="color:var(--accent)">—</span></div>
-        </div>
-        <div class="body-summary" id="body-summary"></div>
+        <div class="panel-title">Skill Tree Path</div>
+        <select id="char-path" onchange="updatePath()">
+            <option value="none">Unaligned</option>
+            <option value="titan">Titan (Upper/Strength focus)</option>
+            <option value="wraith">Wraith (Speed focus)</option>
+            <option value="paladin">Paladin (Balanced)</option>
+        </select>
     </div>
-    <div class="panel">
-      <div class="panel-title">Sheet</div>
-      <div class="char-sheet">
-        <div class="char-portrait">
-            <svg class="char-silhouette" viewBox="0 0 120 180"><circle cx="60" cy="30" r="18" fill="rgba(200,169,110,0.15)"/><path d="M30 75 L60 65 L90 75 L95 130 L75 130 L70 110 L60 115 L50 110 L45 130 L25 130 Z" fill="rgba(200,169,110,0.1)"/></svg>
-            <div class="char-overall-rank"><div class="big-rank" id="char-overall-rank-display">—</div></div>
-        </div>
-        <div class="char-stats" id="char-stats"></div>
-      </div>
+    <div id="lineage-stats" style="display:flex; gap:10px; margin-bottom:20px;">
+        <div class="panel" style="flex:1; text-align:center;">Golf: <span id="stat-golf" style="color:var(--accent)">—</span></div>
+        <div class="panel" style="flex:1; text-align:center;">Javelin: <span id="stat-javelin" style="color:var(--accent)">—</span></div>
     </div>
-    <div class="settings-grid">
-        <button class="btn btn-full" onclick="exportData()">Export JSON</button>
-        <button class="btn btn-full" onclick="document.getElementById('import-file').click()">Import JSON</button>
-        <input type="file" id="import-file" style="display:none" onchange="importData(event)">
-    </div>
+    <div id="char-stats"></div>
+    <button class="btn btn-full" onclick="exportData()">Export Data</button>
   </div>
 
   <div class="view" id="view-achievements">
-    <div class="panel"><div class="panel-title">Feats Unlocked <span id="ach-count"></span></div><div class="achievements-grid" id="achievements-grid"></div></div>
+    <div id="achievements-grid" class="achievements-grid"></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="result-modal">
   <div class="modal">
     <div class="modal-title">Ascension Logged</div>
-    <div id="modal-exercise-name" style="color:var(--accent);"></div>
-    <div style="display:flex; align-items:center; gap:16px; margin:20px 0;">
-      <div class="rank-badge" id="modal-rank-badge"></div>
-      <div><div id="modal-pct" style="font-weight:700;"></div><div id="modal-vs" style="font-size:12px; color:var(--muted);"></div></div>
+    <div id="modal-badge-wrap" style="display:flex; align-items:center; gap:15px; margin:20px 0;">
+        <div class="rank-badge" id="modal-rank"></div>
+        <div id="modal-pct" style="font-weight:700;"></div>
     </div>
-    <div id="modal-pb-msg" style="text-align:center; color:var(--accent);"></div>
-    <div id="modal-xp-gained" style="text-align:center; color:var(--accent2); margin-top:5px;"></div>
-    <div class="timer-wrap" id="timer-ui" style="display:block; border-top:1px solid var(--border); padding-top:20px; margin-top:20px;">
+    <div id="modal-pb-msg" style="text-align:center; color:var(--accent)"></div>
+    <div id="modal-xp" style="text-align:center; color:var(--accent2); margin:10px 0;"></div>
+    <div class="timer-wrap" id="timer-ui" style="display:block; text-align:center; border-top:1px solid var(--border); padding-top:20px;">
         <div class="timer-display" id="timer-clock">01:30</div>
         <button class="btn btn-small" onclick="startTimer()">Start Rest</button>
     </div>
-    <button class="btn btn-full" onclick="closeModal()" style="margin-top:20px;">Continue</button>
+    <button class="btn btn-full" onclick="closeModal()">Continue</button>
   </div>
 </div>
+
+<div class="modal-overlay" id="chart-modal">
+    <div class="modal">
+        <div class="panel-title" id="chart-title">History</div>
+        <div class="chart-container"><canvas id="historyChart"></canvas></div>
+        <button class="btn btn-full" onclick="document.getElementById('chart-modal').classList.remove('open')">Close</button>
+    </div>
+</div>
+
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
+// --- AUDIO ---
+const aCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(t){
+    const o=aCtx.createOscillator(), g=aCtx.createGain(); o.connect(g); g.connect(aCtx.destination);
+    const n=aCtx.currentTime;
+    if(t==='click'){o.type='sine';o.frequency.setValueAtTime(800,n);o.frequency.exponentialRampToValueAtTime(100,n+0.1);g.gain.setValueAtTime(0.1,n);g.gain.linearRampToValueAtTime(0,n+0.1);}
+    else if(t==='success'){o.type='triangle';o.frequency.setValueAtTime(400,n);o.frequency.exponentialRampToValueAtTime(1200,n+0.3);g.gain.setValueAtTime(0.1,n);g.gain.linearRampToValueAtTime(0,n+0.4);}
+    else if(t==='powerUp'){o.type='sawtooth';o.frequency.setValueAtTime(100,n);o.frequency.linearRampToValueAtTime(800,n+0.5);g.gain.setValueAtTime(0.05,n);g.gain.linearRampToValueAtTime(0,n+0.5);}
+    o.start(); o.stop(n+0.5);
+}
+
 // --- STATE ---
-let state = JSON.parse(localStorage.getItem('sovereign_v2') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"path":"none","boss":null}');
-function save(){ localStorage.setItem('sovereign_v2', JSON.stringify(state)); }
+let state = JSON.parse(localStorage.getItem('sovereign_final') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"path":"none","boss":null,"protocols":[]}');
+function save(){ localStorage.setItem('sovereign_final', JSON.stringify(state)); }
 
 // --- HELPERS ---
-function formatVal(val, unit) {
-    if (unit !== 'minutes' || isNaN(val)) return val;
-    let sT = Math.round(val * 60);
-    return `${Math.floor(Math.abs(sT)/60)}:${(Math.abs(sT)%60).toString().padStart(2,'0')}`;
-}
-function getPct(ex, val){ return ex.direction==='lower' ? Math.round((ex.best/val)*100) : Math.round((val/ex.best)*100); }
-function getRank(pct){
-    if(pct>=100) return 'SSS'; if(pct>=85) return 'SS'; if(pct>=70) return 'S';
-    if(pct>=55) return 'A'; if(pct>=40) return 'B'; if(pct>=25) return 'C';
-    return pct>=10 ? 'D' : 'F';
-}
-function rankToNum(r){ return {F:0,D:1,C:2,B:3,A:4,S:5,SS:6,SSS:7}[r]??0; }
-function numToRank(n){ return ['F','D','C','B','A','S','SS','SSS'][Math.max(0,Math.min(7,Math.round(n)))]; }
-const RC = {F:'#555',D:'#7a4f2a',C:'#2e6b3e',B:'#1a5f8a',A:'#6a2ea0',S:'#c8a92e',SS:'#e07830',SSS:'#cc2040'};
+function formatVal(v,u){ if(u!=='minutes') return v; let s=Math.round(v*60); return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`; }
+function getPct(ex,v){ return ex.direction==='lower' ? Math.round((ex.best/v)*100) : Math.round((v/ex.best)*100); }
+function getRank(p){ if(p>=100)return'SSS';if(p>=85)return'SS';if(p>=70)return'S';if(p>=55)return'A';if(p>=40)return'B';if(p>=25)return'C';return'F';}
+function rankToNum(r){return{F:0,C:1,B:2,A:3,S:4,SS:5,SSS:6}[r]??0;}
+function numToRank(n){return['F','C','B','A','S','SS','SSS'][Math.min(6,Math.round(n))];}
+const RC={F:'#555',D:'#7a4f2a',C:'#2e6b3e',B:'#1a5f8a',A:'#6a2ea0',S:'#c8a92e',SS:'#e07830',SSS:'#cc2040'};
 
 // --- XP ---
-function addXP(base, ex) {
-    let mult = 1;
-    if (state.path==='titan' && (ex.type==='strength'||ex.body==='upper')) mult = 1.2;
-    if (state.path==='wraith' && (ex.type==='speed'||ex.body==='cardio')) mult = 1.2;
-    let gained = Math.round(base * mult);
-    state.xp += gained;
-    let nL = Math.floor(Math.sqrt(state.xp / 100)) + 1;
-    if (nL > state.level) { state.level = nL; showToast({icon:'🆙', name:`Level ${state.level}!`}); }
+function addXP(base, ex){
+    let mult=1;
+    if(state.path==='titan'&&(ex.type==='strength'||ex.body==='upper')) mult=1.2;
+    if(state.path==='wraith'&&(ex.type==='speed'||ex.body==='cardio')) mult=1.2;
+    let gained=Math.round(base*mult); state.xp+=gained;
+    let nL=Math.floor(Math.sqrt(state.xp/100))+1;
+    if(nL>state.level){state.level=nL; showToast({icon:'🆙', name:`LEVEL ${state.level}`});}
     save(); renderHeader(); return gained;
 }
-function renderHeader() {
-    document.getElementById('header-level').textContent = `Level ${state.level}`;
-    let next = Math.pow(state.level, 2) * 100, prev = Math.pow(state.level-1, 2) * 100;
-    document.getElementById('header-xp-fill').style.width = `${((state.xp - prev) / (next - prev)) * 100}%`;
-    document.getElementById('header-xp-text').textContent = `${state.xp} / ${next} XP`;
+function renderHeader(){
+    document.getElementById('header-level').textContent=`Level ${state.level}`;
+    let next=Math.pow(state.level,2)*100, prev=Math.pow(state.level-1,2)*100;
+    document.getElementById('header-xp-fill').style.width=`${((state.xp-prev)/(next-prev))*100}%`;
+    document.getElementById('header-xp-text').textContent=`${state.xp} / ${next} XP`;
 }
 
-// --- BOSS SYSTEM ---
-function manageBoss() {
-    const bossEl = document.getElementById('boss-container');
-    const viable = state.exercises.filter(e => e.pb !== null);
-    if (!viable.length) return;
-    if (!state.boss) {
-        let ex = viable[Math.floor(Math.random()*viable.length)];
-        state.boss = { exId: ex.id, target: parseFloat((ex.direction==='lower' ? ex.pb*0.95 : ex.pb*1.05).toFixed(2)) };
+// --- BOSS ---
+function manageBoss(){
+    const bEl=document.getElementById('boss-container');
+    const viable=state.exercises.filter(e=>e.pb!==null);
+    if(!viable.length) return;
+    if(!state.boss){
+        let ex=viable[Math.floor(Math.random()*viable.length)];
+        state.boss={exId:ex.id, target:parseFloat((ex.direction==='lower'?ex.pb*0.95:ex.pb*1.05).toFixed(2))};
         save();
     }
-    let bEx = state.exercises.find(e => e.id === state.boss.exId);
-    if (bEx) {
-        bossEl.style.display = 'block';
-        document.getElementById('boss-details').innerHTML = `<div style="display:flex; justify-content:space-between"><div>${bEx.name}</div><div class="boss-target">${formatVal(state.boss.target, bEx.unit)}</div></div>`;
+    let bEx=state.exercises.find(e=>e.id===state.boss.exId);
+    if(bEx){
+        bEl.style.display='block';
+        document.getElementById('boss-details').innerHTML=`<div style="display:flex; justify-content:space-between"><div>${bEx.name}</div><div class="boss-target">${formatVal(state.boss.target,bEx.unit)}</div></div>`;
     }
 }
 
-// --- UI ---
-function updateExInputUI() {
-    let isT = document.getElementById('ex-unit').value === 'minutes';
-    document.getElementById('ex-best-standard-wrap').style.display = isT ? 'none' : 'block';
-    document.getElementById('ex-best-time-wrap').style.display = isT ? 'flex' : 'none';
+// --- CHARTS ---
+let rChart, hChart;
+function renderRadar(){
+    const ctx=document.getElementById('radarChart');
+    const s={ Upper:0, Lower:0, Core:0, Cardio:0, Speed:0 };
+    state.exercises.forEach(ex=>{
+        let p=ex.pb?getPct(ex,ex.pb):0;
+        if(ex.body==='upper') s.Upper=Math.max(s.Upper,p);
+        if(ex.body==='lower') s.Lower=Math.max(s.Lower,p);
+        if(ex.body==='core') s.Core=Math.max(s.Core,p);
+        if(ex.body==='cardio') s.Cardio=Math.max(s.Cardio,p);
+        if(ex.type==='speed') s.Speed=Math.max(s.Speed,p);
+    });
+    if(rChart) rChart.destroy();
+    rChart = new Chart(ctx,{type:'radar',data:{labels:Object.keys(s),datasets:[{data:Object.values(s),backgroundColor:'rgba(200,169,110,0.2)',borderColor:'#c8a96e'}]},options:{scales:{r:{min:0,max:100,ticks:{display:false},grid:{color:'rgba(255,255,255,0.1)'}}},plugins:{legend:{display:false}}}});
 }
-function updateLogInputUI() {
-    let ex = state.exercises.find(e => e.id == document.getElementById('log-exercise').value);
-    let isT = ex && ex.unit === 'minutes';
-    document.getElementById('log-amount-standard-wrap').style.display = isT ? 'none' : 'block';
-    document.getElementById('log-amount-time-wrap').style.display = isT ? 'flex' : 'none';
-    updateShadow();
-}
-function updateShadow() {
-    let ex = state.exercises.find(e => e.id == document.getElementById('log-exercise').value);
-    let wrap = document.getElementById('shadow-display');
-    if (ex && ex.pb !== null) {
-        wrap.classList.add('active');
-        document.getElementById('shadow-val').textContent = formatVal(ex.pb, ex.unit);
-    } else wrap.classList.remove('active');
+function showHistory(id){
+    const ex=state.exercises.find(e=>e.id===id), logs=state.logs.filter(l=>l.exId===id).sort((a,b)=>a.ts-b.ts);
+    document.getElementById('chart-title').textContent=ex.name;
+    document.getElementById('chart-modal').classList.add('open');
+    if(hChart) hChart.destroy();
+    hChart = new Chart(document.getElementById('historyChart'),{type:'line',data:{labels:logs.map(l=>new Date(l.ts).toLocaleDateString()),datasets:[{data:logs.map(l=>l.val),borderColor:'#c8a96e',tension:0.3}]},options:{maintainAspectRatio:false}});
 }
 
-// --- EXERCISES ---
-let editingId = null;
-function addExercise() {
-    let unit = document.getElementById('ex-unit').value, best;
-    if (unit === 'minutes') best = (parseFloat(document.getElementById('ex-best-min').value)||0) + ((parseFloat(document.getElementById('ex-best-sec').value)||0)/60);
-    else best = parseFloat(document.getElementById('ex-best').value);
-    if (!document.getElementById('ex-name').value || isNaN(best)) return;
-    if (editingId) {
-        let idx = state.exercises.findIndex(e => e.id === editingId);
-        state.exercises[idx] = {...state.exercises[idx], name:document.getElementById('ex-name').value, unit, best, direction:document.getElementById('ex-direction').value, body:document.getElementById('ex-body').value, type:document.getElementById('ex-type').value};
-        editingId = null; document.getElementById('btn-submit-ex').textContent = "Add Exercise";
-    } else state.exercises.push({id:Date.now(), name:document.getElementById('ex-name').value, unit, best, direction:document.getElementById('ex-direction').value, body:document.getElementById('ex-body').value, type:document.getElementById('ex-type').value, pb:null});
+// --- ARSENAL ---
+let editId=null;
+function updateExInputUI(){
+    let isT=document.getElementById('ex-unit').value==='minutes';
+    document.getElementById('ex-best-standard-wrap').style.display=isT?'none':'block';
+    document.getElementById('ex-best-time-wrap').style.display=isT?'flex':'none';
+}
+function addExercise(){
+    let u=document.getElementById('ex-unit').value, b;
+    if(u==='minutes') b=(parseFloat(document.getElementById('ex-best-min').value)||0)+(parseFloat(document.getElementById('ex-best-sec').value)||0)/60;
+    else b=parseFloat(document.getElementById('ex-best').value);
+    if(!document.getElementById('ex-name').value||isNaN(b)) return;
+    if(editId){
+        let i=state.exercises.findIndex(e=>e.id===editId);
+        state.exercises[i]={...state.exercises[i], name:document.getElementById('ex-name').value, unit:u, best:b, direction:document.getElementById('ex-direction').value, body:document.getElementById('ex-body').value, type:document.getElementById('ex-type').value};
+        editId=null; document.getElementById('btn-submit-ex').textContent="Add to Arsenal";
+    } else state.exercises.push({id:Date.now(), name:document.getElementById('ex-name').value, unit:u, best:b, body:document.getElementById('ex-body').value, type:document.getElementById('ex-type').value, direction:document.getElementById('ex-direction').value, pb:null});
     save(); location.reload();
 }
-function renderExercises() {
-    document.getElementById('exercise-list').innerHTML = state.exercises.map(ex => `
+function renderExercises(){
+    document.getElementById('exercise-list').innerHTML=state.exercises.map(ex=>`
     <div class="exercise-card">
-        <div class="exercise-info"><h3>${ex.name}</h3><span class="unit">Best: ${formatVal(ex.best, ex.unit)}</span></div>
+        <div class="exercise-info"><h3>${ex.name}</h3><span class="unit">Best: ${formatVal(ex.pb||0,ex.unit)}</span><br><span class="history-link" onclick="showHistory(${ex.id})">Chronology</span></div>
         <div class="exercise-actions">
             <button class="btn btn-small" onclick="editEx(${ex.id})">Edit</button>
             <button class="btn btn-danger btn-small" onclick="delEx(${ex.id})">Del</button>
         </div>
     </div>`).join('');
 }
-function delEx(id){ 
-  if(!confirm("Delete exercise and all its history?")) return;
-  state.exercises=state.exercises.filter(e=>e.id!==id); state.logs=state.logs.filter(l=>l.exId!==id); save(); renderExercises(); 
-}
 function editEx(id){
-    editingId = id; let ex = state.exercises.find(e=>e.id===id);
-    document.getElementById('ex-name').value = ex.name; document.getElementById('ex-unit').value = ex.unit;
-    updateExInputUI(); document.getElementById('btn-submit-ex').textContent = "Update";
+    editId=id; let ex=state.exercises.find(e=>e.id===id);
+    document.getElementById('ex-name').value=ex.name; document.getElementById('ex-unit').value=ex.unit; updateExInputUI();
+    document.getElementById('btn-submit-ex').textContent="Update Protocol"; window.scrollTo(0,0);
+}
+function delEx(id){ if(confirm("Purge exercise and logs?")){state.exercises=state.exercises.filter(e=>e.id!==id); state.logs=state.logs.filter(l=>l.exId!==id); save(); renderExercises();} }
+
+// --- LOGGING ---
+let aProto=null, pIdx=0;
+function updateLogInputUI(){
+    let ex=state.exercises.find(e=>e.id==document.getElementById('log-exercise').value), isT=ex&&ex.unit==='minutes';
+    document.getElementById('log-amount-standard-wrap').style.display=isT?'none':'block';
+    document.getElementById('log-amount-time-wrap').style.display=isT?'flex':'none';
+    let w=document.getElementById('shadow-display');
+    if(ex&&ex.pb!==null){w.classList.add('active'); document.getElementById('shadow-val').textContent=formatVal(ex.pb,ex.unit);} else w.classList.remove('active');
+}
+function submitLog(){
+    let ex=state.exercises.find(e=>e.id==document.getElementById('log-exercise').value), v;
+    if(ex.unit==='minutes') v=(parseFloat(document.getElementById('log-amount-min').value)||0)+(parseFloat(document.getElementById('log-amount-sec').value)||0)/60;
+    else v=parseFloat(document.getElementById('log-amount').value);
+    if(!ex||isNaN(v)) return;
+    let ts=new Date(document.getElementById('log-date').value).getTime();
+    let isPB=ex.pb===null||(ex.direction==='lower'?v<ex.pb:v>ex.pb);
+    if(isPB){ex.pb=v; playSound('powerUp');} else playSound('success');
+    let bDef=false;
+    if(state.boss&&state.boss.exId==ex.id && (ex.direction==='higher'?v>=state.boss.target:v<=state.boss.target)){bDef=true; state.boss=null;}
+    let xp=addXP(50,ex); if(isPB)xp+=addXP(100,ex); if(bDef)xp+=addXP(500,ex);
+    state.logs.push({id:Date.now(), exId:ex.id, val:v, ts}); save();
+    showModal(ex,v,xp,isPB,bDef); renderHistory();
+    if(aProto){ pIdx++; if(pIdx>=aProto.exercises.length){aProto=null; document.getElementById('proto-notice').style.display='none';} else loadProtoEx();}
+}
+function showModal(ex,v,xp,isPB,bDef){
+    let p=getPct(ex,v), r=getRank(p);
+    document.getElementById('modal-rank').textContent=r; document.getElementById('modal-rank').className=`rank-badge rank-${r}`;
+    document.getElementById('modal-pct').textContent=`${p}% Ascension`;
+    document.getElementById('modal-pb-msg').textContent=isPB?'👑 NEW PERSONAL BEST':'';
+    if(bDef) document.getElementById('modal-pb-msg').textContent+=' | 👹 BOSS DEFEATED';
+    document.getElementById('modal-xp').textContent=`+${xp} XP`;
+    document.getElementById('result-modal').classList.add('open'); checkAchs();
 }
 
-// --- LOGS & HISTORY ---
-function submitLog() {
-    let ex = state.exercises.find(e => e.id == document.getElementById('log-exercise').value), val;
-    if (ex.unit==='minutes') val = (parseFloat(document.getElementById('log-amount-min').value)||0) + ((parseFloat(document.getElementById('log-amount-sec').value)||0)/60);
-    else val = parseFloat(document.getElementById('log-amount').value);
-    if (!ex || isNaN(val)) return;
-    let ts = new Date(document.getElementById('log-date').value).getTime();
-    let isPB = ex.pb===null || (ex.direction==='lower'?val<ex.pb:val>ex.pb);
-    if(isPB) ex.pb = val;
-    let bossDef = false;
-    if (state.boss && state.boss.exId == ex.id) {
-        if ((ex.direction==='higher' && val>=state.boss.target) || (ex.direction==='lower' && val<=state.boss.target)) {
-            bossDef = true; state.boss = null;
-        }
-    }
-    let xp = addXP(50, ex); if(isPB) xp += addXP(100, ex); if(bossDef) xp += addXP(500, ex);
-    state.logs.push({id:Date.now(), exId:ex.id, val, ts}); save();
-    showModal(ex, val, xp, isPB, bossDef);
-    renderHistory();
-}
+// --- HISTORY & DELETE ---
 function renderHistory(){
-  const cont = document.getElementById('log-history');
-  const sorted = [...state.logs].sort((a,b) => b.ts - a.ts);
-  if(!sorted.length) { cont.innerHTML = '<div style="text-align:center; padding:20px; color:var(--muted);">No logs yet.</div>'; return; }
-  cont.innerHTML = sorted.map(l => {
-    const ex = state.exercises.find(e => e.id == l.exId);
-    if(!ex) return '';
-    return `<div class="log-entry"><div class="log-date">${new Date(l.ts).toLocaleDateString('en-ZA', {month:'short', day:'numeric'})}</div><div class="log-name">${ex.name}</div><div class="log-val-wrap"><span class="log-val">${formatVal(l.val, ex.unit)}</span><span class="log-unit">${ex.unit}</span></div><button class="btn btn-danger btn-small" style="padding:4px 8px; font-size:8px; min-width:auto;" onclick="deleteLog(${l.id})">✖</button></div>`;
-  }).join('');
+    const sorted=[...state.logs].sort((a,b)=>b.ts-a.ts);
+    document.getElementById('log-history').innerHTML=sorted.map(l=>{
+        const ex=state.exercises.find(e=>e.id==l.exId); if(!ex)return'';
+        return `<div class="log-entry">
+            <div style="font-size:10px; color:var(--muted)">${new Date(l.ts).toLocaleDateString()}</div>
+            <div class="log-name">${ex.name}</div>
+            <div style="text-align:right"><strong>${formatVal(l.val,ex.unit)}</strong></div>
+            <button class="btn btn-danger btn-small" style="width:30px" onclick="deleteLog(${l.id})">✖</button>
+        </div>`;
+    }).join('');
 }
 function deleteLog(id){
-  if(!confirm("Delete log entry?")) return;
-  state.logs = state.logs.filter(l => l.id !== id);
-  state.exercises.forEach(ex => {
-    const exL = state.logs.filter(l => l.exId === ex.id);
-    if(!exL.length) ex.pb = null;
-    else ex.pb = ex.direction==='lower' ? Math.min(...exL.map(l=>l.val)) : Math.max(...exL.map(l=>l.val));
-  });
-  save(); renderHistory(); renderCharacter();
+    if(confirm("Delete this memory?")){
+        state.logs=state.logs.filter(l=>l.id!==id);
+        state.exercises.forEach(ex=>{
+            let eL=state.logs.filter(l=>l.exId===ex.id);
+            if(!eL.length)ex.pb=null; else ex.pb=ex.direction==='lower'?Math.min(...eL.map(l=>l.val)):Math.max(...eL.map(l=>l.val));
+        });
+        save(); renderHistory(); renderCharacter();
+    }
 }
-function showModal(ex, val, xp, isPB, bossDef) {
-    let pct = getPct(ex, val), rank = getRank(pct);
-    document.getElementById('modal-exercise-name').textContent = ex.name;
-    document.getElementById('modal-rank-badge').textContent = rank;
-    document.getElementById('modal-rank-badge').className = `rank-badge rank-${rank}`;
-    document.getElementById('modal-pct').textContent = `${pct}% Ascension`;
-    document.getElementById('modal-vs').textContent = `Value: ${formatVal(val, ex.unit)}`;
-    document.getElementById('modal-pb-msg').textContent = isPB ? '👑 PERSONAL BEST UNLOCKED' : '';
-    if(bossDef) document.getElementById('modal-pb-msg').textContent += ' | 👹 BOSS DEFEATED';
-    document.getElementById('modal-xp-gained').textContent = `+${xp} XP Gained`;
-    document.getElementById('result-modal').classList.add('open');
-    checkAchievements();
-}
-function closeModal(){ document.getElementById('result-modal').classList.remove('open'); clearInterval(tInt); }
 
 // --- FEATS ---
-const FEATS = [
+const FEATS=[
     {id:'f1', icon:'⚔️', name:'First Step', desc:'Log 1 session.', check:s=>s.logs.length>=1},
     {id:'f2', icon:'🔥', name:'Dedicated', desc:'Log 10 sessions.', check:s=>s.logs.length>=10},
-    {id:'f3', icon:'👑', name:'Sovereign', desc:'Achieve an S rank.', check:s=>s.logs.some(l=>{let ex=s.exercises.find(e=>e.id==l.exId); return ex&&rankToNum(getRank(getPct(ex,l.val)))>=5})}
+    {id:'f3', icon:'👑', name:'Sovereign', desc:'Achieve S Rank.', check:s=>s.logs.some(l=>{let e=s.exercises.find(x=>x.id==l.exId); return e&&getPct(e,l.val)>=70})},
+    {id:'f4', icon:'👹', name:'Slayer', desc:'Defeat a Boss.', check:s=>s.unlockedAchs['boss_slayer']}
 ];
-function checkAchievements(){
-    FEATS.forEach(f => { if(!state.unlockedAchs[f.id] && f.check(state)){ state.unlockedAchs[f.id]=Date.now(); showToast({icon:f.icon, name:f.name}); }});
-    save();
-}
-function resetAchievement(id) {
-    if(!confirm("Reset this achievement?")) return;
-    delete state.unlockedAchs[id]; save(); renderAchievements();
-}
+function checkAchs(){ FEATS.forEach(f=>{if(!state.unlockedAchs[f.id]&&f.check(state)){state.unlockedAchs[f.id]=Date.now(); showToast({icon:f.icon,name:f.name});}}); save();}
+function resetAch(id){ if(confirm("Reset feat?")){delete state.unlockedAchs[id]; save(); renderAchievements();}}
 function renderAchievements(){
-    document.getElementById('achievements-grid').innerHTML = FEATS.map(f => `
-    <div class="achievement ${state.unlockedAchs[f.id]?'unlocked':'locked'}" onclick="${state.unlockedAchs[f.id] ? `resetAchievement('${f.id}')` : ''}">
-        <div class="ach-icon">${f.icon}</div>
-        <div><div class="ach-name">${f.name}</div><div class="ach-desc">${f.desc}</div></div>
-    </div>`).join('');
+    document.getElementById('achievements-grid').innerHTML=FEATS.map(f=>`<div class="achievement ${state.unlockedAchs[f.id]?'unlocked':'locked'}" onclick="if(state.unlockedAchs['${f.id}'])resetAch('${f.id}')"><div class="ach-icon">${f.icon}</div><div><div class="ach-name">${f.name}</div><div class="ach-desc">${f.desc}</div></div></div>`).join('');
 }
 
-// --- CHARACTER ---
-function renderCharacter(){
-    let exR = state.exercises.map(ex => { let p = ex.pb?getPct(ex,ex.pb):0; return {ex, p, rank:getRank(p)}});
-    document.getElementById('char-stats').innerHTML = exR.map(r => `<div class="stat-row"><div class="rank-badge rank-${r.rank}" style="width:30px;height:30px;font-size:10px">${r.rank}</div><div class="stat-name">${r.ex.name}</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(r.p,100)}%;background:${RC[r.rank]}"></div></div><div class="stat-val">${formatVal(r.ex.pb, r.ex.unit)}</div></div>`).join('');
-    let upperR = exR.filter(r => r.ex.body === 'upper');
-    document.getElementById('stat-golf').textContent = numToRank(exR.length ? exR.map(r=>rankToNum(r.rank)).reduce((a,b)=>a+b,0)/exR.length : 0);
-    document.getElementById('stat-javelin').textContent = numToRank(upperR.length?upperR.map(r=>rankToNum(r.rank)).reduce((a,b)=>a+b,0)/upperR.length:0);
+// --- PROTOCOLS ---
+function createProtocol(){
+    let n=document.getElementById('proto-name').value, checks=document.querySelectorAll('.proto-check:checked'), ids=Array.from(checks).map(c=>parseInt(c.value));
+    if(!n||!ids.length)return; state.protocols.push({id:Date.now(), name:n, exercises:ids}); save(); renderProtocols();
+}
+function renderProtocols(){
+    document.getElementById('protocol-list').innerHTML=state.protocols.map(p=>`<div class="protocol-card" onclick="startProto(${p.id})"><div>${p.name}</div><div style="font-size:9px; color:var(--muted)">${p.exercises.length} Exercises</div></div>`).join('');
+    document.getElementById('proto-selector').innerHTML=state.exercises.map(e=>`<div><input type="checkbox" class="proto-check" value="${e.id}"> ${e.name}</div>`).join('');
+}
+function startProto(id){ aProto=state.protocols.find(p=>p.id===id); pIdx=0; switchTab('log',document.querySelectorAll('.tab')[2]); loadProtoEx();}
+function loadProtoEx(){
+    let id=aProto.exercises[pIdx]; document.getElementById('log-exercise').value=id;
+    document.getElementById('proto-notice').style.display='block'; document.getElementById('proto-notice').textContent=`// PROTOCOL: ${aProto.name} (${pIdx+1}/${aProto.exercises.length}) //`;
+    updateLogInputUI();
 }
 
 // --- SYSTEM ---
-let tInt;
-function startTimer(){ let l=90; clearInterval(tInt); tInt=setInterval(()=>{ l--; document.getElementById('timer-clock').textContent=`0${Math.floor(l/60)}:${(l%60).toString().padStart(2,'0')}`; if(l<=0){clearInterval(tInt); document.getElementById('timer-clock').textContent="GO!";}},1000);}
-function switchTab(n,e){ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('view-'+n).classList.add('active'); e.classList.add('active'); if(n==='character')renderCharacter(); if(n==='achievements')renderAchievements(); if(n==='log')renderLogView();}
-function renderLogView(){ document.getElementById('log-exercise').innerHTML = '<option value="">-Select-</option>' + state.exercises.map(e=>`<option value="${e.id}">${e.name}</option>`).join(''); renderHistory(); }
+let tI;
+function startTimer(){ let l=90; clearInterval(tI); tI=setInterval(()=>{l--; document.getElementById('timer-clock').textContent=`0${Math.floor(l/60)}:${(l%60).toString().padStart(2,'0')}`; if(l<=0){clearInterval(tI);playSound('click');}},1000);}
+function switchTab(n,e){
+    playSound('click'); document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('view-'+n).classList.add('active'); e.classList.add('active');
+    if(n==='character'){renderCharacter(); renderRadar();} if(n==='achievements')renderAchievements(); if(n==='protocols')renderProtocols(); if(n==='log')renderLogView();
+}
+function renderLogView(){ document.getElementById('log-exercise').innerHTML='<option value="">-Select-</option>'+state.exercises.map(e=>`<option value="${e.id}">${e.name}</option>`).join(''); renderHistory();}
+function renderCharacter(){
+    let exR=state.exercises.map(ex=>{let p=ex.pb?getPct(ex,ex.pb):0; return{ex,p,rank:getRank(p)}});
+    document.getElementById('char-stats').innerHTML=exR.map(r=>`<div class="log-entry"><div class="rank-badge rank-${r.rank}" style="width:30px;height:30px;font-size:10px">${r.rank}</div><div>${r.ex.name}</div><div style="text-align:right">${formatVal(r.ex.pb,r.ex.unit)}</div></div>`).join('');
+    let upperR=exR.filter(r=>r.ex.body==='upper'), allR=exR.length?exR.map(r=>rankToNum(r.rank)).reduce((a,b)=>a+b,0)/exR.length:0;
+    document.getElementById('stat-golf').textContent=numToRank(allR);
+    document.getElementById('stat-javelin').textContent=numToRank(upperR.length?upperR.map(r=>rankToNum(r.rank)).reduce((a,b)=>a+b,0)/upperR.length:0);
+}
+function closeModal(){ document.getElementById('result-modal').classList.remove('open'); clearInterval(tI); }
 function showToast(a){ let e=document.createElement('div'); e.className='toast show'; e.innerHTML=`<span>${a.icon}</span><div>${a.name}</div>`; document.getElementById('toast-wrap').appendChild(e); setTimeout(()=>e.remove(),3000);}
 function exportData(){ let b=new Blob([JSON.stringify(state)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='sovereign.json'; a.click();}
-function importData(e) {
-  const r = new FileReader(); r.onload = (ev) => { state = JSON.parse(ev.target.result); save(); location.reload(); }; r.readAsText(e.target.files[0]);
-}
 
 // INIT
-document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
-renderHeader(); renderExercises(); manageBoss(); renderHistory();
+document.getElementById('log-date').value=new Date().toISOString().split('T')[0];
+renderHeader(); renderExercises(); manageBoss();
 </script>
 </body>
 </html>
