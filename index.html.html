@@ -72,7 +72,7 @@
   .exercise-list{display:flex;flex-direction:column;gap:12px;}
   .exercise-card{
     background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:2px; padding:14px 18px;
-    display:grid; grid-template-columns: 1fr 15%; gap:16px; align-items:center;
+    display:grid; grid-template-columns: 1fr 20%; gap:16px; align-items:center;
   }
   .exercise-info h3{ font-family:'Cinzel',serif; font-size:13px; text-transform:uppercase; white-space: normal; word-break: break-word; }
   .exercise-actions{ display:flex; flex-direction:column; gap:6px; align-items: flex-end; }
@@ -133,7 +133,7 @@
         <select id="ex-unit" onchange="updateExInputUI()">
             <option value="reps">Reps</option><option value="kg">kg</option><option value="minutes">Time (M:S)</option>
         </select>
-        <div id="ex-best-standard-wrap"><input type="number" id="ex-best" placeholder="World Best"></div>
+        <div id="ex-best-standard-wrap"><input type="number" id="ex-best" placeholder="Benchmark"></div>
         <div id="ex-best-time-wrap" style="display:none; gap:8px; display:flex;">
           <input type="number" id="ex-best-min" placeholder="Min" style="flex:1;"><input type="number" id="ex-best-sec" placeholder="Sec" style="flex:1;">
         </div>
@@ -150,7 +150,7 @@
     <div class="panel">
       <div class="panel-title">Create Protocol</div>
       <input type="text" id="proto-name" placeholder="e.g. Leg Day">
-      <div id="proto-selector" style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:5px;"></div>
+      <div id="proto-selector" style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:5px; max-height: 200px; overflow-y: auto; padding: 10px; border: 1px solid var(--border);"></div>
       <button class="btn btn-full" onclick="createProtocol()">Initialize Protocol</button>
     </div>
     <div id="protocol-list"></div>
@@ -243,9 +243,83 @@ function playSound(t){
     o.start(); o.stop(n+0.5);
 }
 
-// --- STATE ---
-let state = JSON.parse(localStorage.getItem('sovereign_final') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"path":"none","boss":null,"protocols":[]}');
-function save(){ localStorage.setItem('sovereign_final', JSON.stringify(state)); }
+// --- STATE & SEED DATA ---
+const SEED_EXERCISES = [
+    // GOLF PERFORMANCE (8.2 Handicap Focus)
+    {name: "Golf Swing Rotation (Cable)", unit: "kg", best: 60, body: "core", type: "speed", direction: "higher"},
+    {name: "Medicine Ball Rotational Slam", unit: "kg", best: 15, body: "core", type: "speed", direction: "higher"},
+    {name: "Single-Leg Romanian Deadlift", unit: "kg", best: 100, body: "lower", type: "strength", direction: "higher"},
+    {name: "Clubhead Speed Potential", unit: "reps", best: 125, body: "upper", type: "speed", direction: "higher"},
+    
+    // JAVELIN LEGACY (Power & Explosion)
+    {name: "Overhead Javelin Throw (Weight)", unit: "kg", best: 10, body: "upper", type: "speed", direction: "higher"},
+    {name: "Medicine Ball Chest Pass", unit: "reps", best: 50, body: "upper", type: "speed", direction: "higher"},
+    {name: "Explosive Step Up", unit: "kg", best: 80, body: "lower", type: "speed", direction: "higher"},
+    {name: "National Tier Sprint (30m)", unit: "minutes", best: 0.065, body: "cardio", type: "speed", direction: "lower"}, // 3.9 seconds
+
+    // UPPER BODY STRENGTH
+    {name: "Bench Press", unit: "kg", best: 140, body: "upper", type: "strength", direction: "higher"},
+    {name: "Overhead Press", unit: "kg", best: 90, body: "upper", type: "strength", direction: "higher"},
+    {name: "Pull Ups (Weighted)", unit: "kg", best: 40, body: "upper", type: "strength", direction: "higher"},
+    {name: "Incline Dumbbell Press", unit: "kg", best: 50, body: "upper", type: "strength", direction: "higher"},
+    {name: "Dips (Weighted)", unit: "kg", best: 60, body: "upper", type: "strength", direction: "higher"},
+    {name: "Barbell Row", unit: "kg", best: 120, body: "upper", type: "strength", direction: "higher"},
+    {name: "Lat Pulldown", unit: "kg", best: 110, body: "upper", type: "strength", direction: "higher"},
+    {name: "Face Pulls", unit: "reps", best: 100, body: "upper", type: "strength", direction: "higher"},
+    {name: "Hammer Curls", unit: "kg", best: 30, body: "upper", type: "strength", direction: "higher"},
+    {name: "Lateral Raises", unit: "kg", best: 20, body: "upper", type: "strength", direction: "higher"},
+
+    // LOWER BODY STRENGTH
+    {name: "Back Squat", unit: "kg", best: 200, body: "lower", type: "strength", direction: "higher"},
+    {name: "Deadlift (Conventional)", unit: "kg", best: 240, body: "lower", type: "strength", direction: "higher"},
+    {name: "Front Squat", unit: "kg", best: 140, body: "lower", type: "strength", direction: "higher"},
+    {name: "Leg Press", unit: "kg", best: 450, body: "lower", type: "strength", direction: "higher"},
+    {name: "Bulgarian Split Squat", unit: "kg", best: 80, body: "lower", type: "strength", direction: "higher"},
+    {name: "Calf Raises (Standing)", unit: "kg", best: 150, body: "lower", type: "strength", direction: "higher"},
+    {name: "Glute Ham Raise", unit: "reps", best: 30, body: "lower", type: "strength", direction: "higher"},
+    {name: "Hack Squat", unit: "kg", best: 180, body: "lower", type: "strength", direction: "higher"},
+    {name: "Hip Thrust", unit: "kg", best: 220, body: "lower", type: "strength", direction: "higher"},
+
+    // CORE & STABILITY
+    {name: "Ab Wheel Rollouts", unit: "reps", best: 50, body: "core", type: "strength", direction: "higher"},
+    {name: "Plank Duration", unit: "minutes", best: 10, body: "core", type: "endurance", direction: "higher"},
+    {name: "Hanging Leg Raises", unit: "reps", best: 40, body: "core", type: "strength", direction: "higher"},
+    {name: "Russian Twists (Weighted)", unit: "reps", best: 100, body: "core", type: "strength", direction: "higher"},
+    {name: "Woodchoppers", unit: "kg", best: 50, body: "core", type: "speed", direction: "higher"},
+    {name: "Dragon Flag", unit: "reps", best: 15, body: "core", type: "strength", direction: "higher"},
+    {name: "Pallof Press", unit: "kg", best: 40, body: "core", type: "strength", direction: "higher"},
+
+    // CARDIO & CONDITIONING
+    {name: "5km Run", unit: "minutes", best: 18, body: "cardio", type: "endurance", direction: "lower"},
+    {name: "10km Run", unit: "minutes", best: 40, body: "cardio", type: "endurance", direction: "lower"},
+    {name: "Sprint Intervals (400m)", unit: "minutes", best: 1, body: "cardio", type: "speed", direction: "lower"},
+    {name: "Rowing Machine (2k)", unit: "minutes", best: 6.5, body: "cardio", type: "endurance", direction: "lower"},
+    {name: "Assault Bike (Calorie Sprint)", unit: "reps", best: 100, body: "cardio", type: "speed", direction: "higher"},
+    {name: "Burpees (Max in 1 min)", unit: "reps", best: 35, body: "cardio", type: "speed", direction: "higher"},
+    {name: "Jump Rope (Consecutive)", unit: "reps", best: 500, body: "cardio", type: "endurance", direction: "higher"},
+    {name: "Swimming (500m)", unit: "minutes", best: 7, body: "cardio", type: "endurance", direction: "lower"},
+
+    // FUNCTIONAL & METCON
+    {name: "Farmer's Walk (Distance)", unit: "kg", best: 150, body: "fullbody", type: "strength", direction: "higher"},
+    {name: "Clean & Jerk", unit: "kg", best: 120, body: "fullbody", type: "strength", direction: "higher"},
+    {name: "Snatch", unit: "kg", best: 100, body: "fullbody", type: "strength", direction: "higher"},
+    {name: "Kettlebell Swings", unit: "reps", best: 200, body: "fullbody", type: "endurance", direction: "higher"},
+    {name: "Wall Balls", unit: "reps", best: 150, body: "fullbody", type: "endurance", direction: "higher"},
+    {name: "Sandbag Carry", unit: "minutes", best: 15, body: "fullbody", type: "endurance", direction: "higher"},
+    {name: "Box Jumps", unit: "reps", best: 100, body: "lower", type: "speed", direction: "higher"}
+];
+
+let state = JSON.parse(localStorage.getItem('sovereign_vfinal') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"path":"none","boss":null,"protocols":[]}');
+
+// SEED LOGIC: If no exercises exist, add the pre-loaded ones.
+if (state.exercises.length === 0) {
+    SEED_EXERCISES.forEach((ex, index) => {
+        state.exercises.push({...ex, id: Date.now() + index, pb: null});
+    });
+    save();
+}
+
+function save(){ localStorage.setItem('sovereign_vfinal', JSON.stringify(state)); }
 
 // --- HELPERS ---
 function formatVal(v,u){ if(u!=='minutes') return v; let s=Math.round(v*60); return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`; }
@@ -253,7 +327,7 @@ function getPct(ex,v){ return ex.direction==='lower' ? Math.round((ex.best/v)*10
 function getRank(p){ if(p>=100)return'SSS';if(p>=85)return'SS';if(p>=70)return'S';if(p>=55)return'A';if(p>=40)return'B';if(p>=25)return'C';return'F';}
 function rankToNum(r){return{F:0,C:1,B:2,A:3,S:4,SS:5,SSS:6}[r]??0;}
 function numToRank(n){return['F','C','B','A','S','SS','SSS'][Math.min(6,Math.round(n))];}
-const RC={F:'#555',D:'#7a4f2a',C:'#2e6b3e',B:'#1a5f8a',A:'#6a2ea0',S:'#c8a92e',SS:'#e07830',SSS:'#cc2040'};
+const RC={F:'#555',C:'#2e6b3e',B:'#1a5f8a',A:'#6a2ea0',S:'#c8a92e',SS:'#e07830',SSS:'#cc2040'};
 
 // --- XP ---
 function addXP(base, ex){
@@ -282,7 +356,7 @@ function manageBoss(){
         state.boss={exId:ex.id, target:parseFloat((ex.direction==='lower'?ex.pb*0.95:ex.pb*1.05).toFixed(2))};
         save();
     }
-    let bEx=state.exercises.find(e=>e.id===state.boss.exId);
+    let bEx=state.exercises.find(e => e.id === state.boss.exId);
     if(bEx){
         bEl.style.display='block';
         document.getElementById('boss-details').innerHTML=`<div style="display:flex; justify-content:space-between"><div>${bEx.name}</div><div class="boss-target">${formatVal(state.boss.target,bEx.unit)}</div></div>`;
@@ -363,7 +437,7 @@ function submitLog(){
     if(ex.unit==='minutes') v=(parseFloat(document.getElementById('log-amount-min').value)||0)+(parseFloat(document.getElementById('log-amount-sec').value)||0)/60;
     else v=parseFloat(document.getElementById('log-amount').value);
     if(!ex||isNaN(v)) return;
-    let ts=new Date(document.getElementById('log-date').value).getTime();
+    let ts = new Date(document.getElementById('log-date').value).getTime() || Date.now();
     let isPB=ex.pb===null||(ex.direction==='lower'?v<ex.pb:v>ex.pb);
     if(isPB){ex.pb=v; playSound('powerUp');} else playSound('success');
     let bDef=false;
@@ -385,7 +459,7 @@ function showModal(ex,v,xp,isPB,bDef){
 
 // --- HISTORY & DELETE ---
 function renderHistory(){
-    const sorted=[...state.logs].sort((a,b)=>b.ts-a.ts);
+    const sorted=[...state.logs].sort((a,b)=>b.ts-a.ts).slice(0, 20);
     document.getElementById('log-history').innerHTML=sorted.map(l=>{
         const ex=state.exercises.find(e=>e.id==l.exId); if(!ex)return'';
         return `<div class="log-entry">
@@ -412,7 +486,7 @@ const FEATS=[
     {id:'f1', icon:'⚔️', name:'First Step', desc:'Log 1 session.', check:s=>s.logs.length>=1},
     {id:'f2', icon:'🔥', name:'Dedicated', desc:'Log 10 sessions.', check:s=>s.logs.length>=10},
     {id:'f3', icon:'👑', name:'Sovereign', desc:'Achieve S Rank.', check:s=>s.logs.some(l=>{let e=s.exercises.find(x=>x.id==l.exId); return e&&getPct(e,l.val)>=70})},
-    {id:'f4', icon:'👹', name:'Slayer', desc:'Defeat a Boss.', check:s=>s.unlockedAchs['boss_slayer']}
+    {id:'boss_slayer', icon:'👹', name:'Slayer', desc:'Defeat a Boss.', check:s=>s.unlockedAchs['boss_slayer']}
 ];
 function checkAchs(){ FEATS.forEach(f=>{if(!state.unlockedAchs[f.id]&&f.check(state)){state.unlockedAchs[f.id]=Date.now(); showToast({icon:f.icon,name:f.name});}}); save();}
 function resetAch(id){ if(confirm("Reset feat?")){delete state.unlockedAchs[id]; save(); renderAchievements();}}
@@ -438,12 +512,15 @@ function loadProtoEx(){
 
 // --- SYSTEM ---
 let tI;
-function startTimer(){ let l=90; clearInterval(tI); tI=setInterval(()=>{l--; document.getElementById('timer-clock').textContent=`0${Math.floor(l/60)}:${(l%60).toString().padStart(2,'0')}`; if(l<=0){clearInterval(tI);playSound('click');}},1000);}
+function startTimer(){ let l=90; clearInterval(tI); tI=setInterval(()=>{l--; document.getElementById('timer-clock').textContent=`0${Math.floor(l/60)}:${(l%60).toString().padStart(2,'0')}`; if(l<=0){clearInterval(tI);playSound('powerUp');}},1000);}
 function switchTab(n,e){
     playSound('click'); document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('view-'+n).classList.add('active'); e.classList.add('active');
     if(n==='character'){renderCharacter(); renderRadar();} if(n==='achievements')renderAchievements(); if(n==='protocols')renderProtocols(); if(n==='log')renderLogView();
 }
-function renderLogView(){ document.getElementById('log-exercise').innerHTML='<option value="">-Select-</option>'+state.exercises.map(e=>`<option value="${e.id}">${e.name}</option>`).join(''); renderHistory();}
+function renderLogView(){ 
+    document.getElementById('log-exercise').innerHTML='<option value="">-Select-</option>'+state.exercises.map(e=>`<option value="${e.id}">${e.name}</option>`).join(''); 
+    renderHistory();
+}
 function renderCharacter(){
     let exR=state.exercises.map(ex=>{let p=ex.pb?getPct(ex,ex.pb):0; return{ex,p,rank:getRank(p)}});
     document.getElementById('char-stats').innerHTML=exR.map(r=>`<div class="log-entry"><div class="rank-badge rank-${r.rank}" style="width:30px;height:30px;font-size:10px">${r.rank}</div><div>${r.ex.name}</div><div style="text-align:right">${formatVal(r.ex.pb,r.ex.unit)}</div></div>`).join('');
@@ -454,6 +531,9 @@ function renderCharacter(){
 function closeModal(){ document.getElementById('result-modal').classList.remove('open'); clearInterval(tI); }
 function showToast(a){ let e=document.createElement('div'); e.className='toast show'; e.innerHTML=`<span>${a.icon}</span><div>${a.name}</div>`; document.getElementById('toast-wrap').appendChild(e); setTimeout(()=>e.remove(),3000);}
 function exportData(){ let b=new Blob([JSON.stringify(state)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='sovereign.json'; a.click();}
+function importData(e) {
+  const r = new FileReader(); r.onload = (ev) => { state = JSON.parse(ev.target.result); save(); location.reload(); }; r.readAsText(e.target.files[0]);
+}
 
 // INIT
 document.getElementById('log-date').value=new Date().toISOString().split('T')[0];
