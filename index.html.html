@@ -68,7 +68,7 @@
   .btn-full{width:100%;margin-top:16px;}
   .btn-small { padding: 6px 0; font-size: 9px; width: 100%; text-align: center; }
 
-  /* EXERCISE LAYOUT 15/85 */
+  /* EXERCISE LAYOUT 20/80 */
   .exercise-list{display:flex;flex-direction:column;gap:12px;}
   .exercise-card{
     background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:2px; padding:14px 18px;
@@ -77,6 +77,8 @@
   .exercise-info h3{ font-family:'Cinzel',serif; font-size:13px; text-transform:uppercase; white-space: normal; word-break: break-word; }
   .exercise-actions{ display:flex; flex-direction:column; gap:6px; align-items: flex-end; }
   .history-link { font-size: 9px; color: var(--accent); text-decoration: underline; cursor: pointer; margin-top: 4px; display: inline-block;}
+  .benchmark-text {font-size: 11px; color: var(--muted); margin-top: 4px;}
+  .pb-text {font-size: 11px; color: var(--accent); font-weight: bold;}
 
   .log-entry{
     display:grid; grid-template-columns: auto 1fr auto auto; align-items:center; gap:14px; padding:10px 14px;
@@ -133,7 +135,7 @@
         <select id="ex-unit" onchange="updateExInputUI()">
             <option value="reps">Reps</option><option value="kg">kg</option><option value="minutes">Time (M:S)</option>
         </select>
-        <div id="ex-best-standard-wrap"><input type="number" id="ex-best" placeholder="Benchmark"></div>
+        <div id="ex-best-standard-wrap"><input type="number" id="ex-best" placeholder="SSS Benchmark"></div>
         <div id="ex-best-time-wrap" style="display:none; gap:8px; display:flex;">
           <input type="number" id="ex-best-min" placeholder="Min" style="flex:1;"><input type="number" id="ex-best-sec" placeholder="Sec" style="flex:1;">
         </div>
@@ -149,7 +151,7 @@
   <div class="view" id="view-protocols">
     <div class="panel">
       <div class="panel-title">Create Protocol</div>
-      <input type="text" id="proto-name" placeholder="e.g. Leg Day">
+      <input type="text" id="proto-name" placeholder="e.g. Home Power Day">
       <div id="proto-selector" style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:5px; max-height: 200px; overflow-y: auto; padding: 10px; border: 1px solid var(--border);"></div>
       <button class="btn btn-full" onclick="createProtocol()">Initialize Protocol</button>
     </div>
@@ -243,82 +245,49 @@ function playSound(t){
     o.start(); o.stop(n+0.5);
 }
 
-// --- STATE & SEED DATA ---
+// --- AT HOME ARSENAL DATA ---
 const SEED_EXERCISES = [
-    // --- UPPER BODY: STRENGTH & POWER ---
     {name: "Pull-Ups (Vest: 20kg)", unit: "reps", best: 15, body: "upper", type: "strength", direction: "higher"},
     {name: "Diamond Push-Ups (Vest: 20kg)", unit: "reps", best: 35, body: "upper", type: "strength", direction: "higher"},
     {name: "Chin-Ups (Max Reps)", unit: "reps", best: 30, body: "upper", type: "endurance", direction: "higher"},
     {name: "Floor Press (Barbell: 36kg)", unit: "reps", best: 50, body: "upper", type: "strength", direction: "higher"},
     {name: "Overhead Press (Barbell: 36kg)", unit: "reps", best: 25, body: "upper", type: "strength", direction: "higher"},
-    {name: "Dumbbell Row (Dumbbell: 18kg)", unit: "reps", best: 40, body: "upper", type: "strength", direction: "higher"},
+    {name: "Dumbbell Row (18kg)", unit: "reps", best: 40, body: "upper", type: "strength", direction: "higher"},
     {name: "Archer Push-Ups", unit: "reps", best: 20, body: "upper", type: "strength", direction: "higher"},
     {name: "Pseudo-Planche Push-Ups", unit: "reps", best: 15, body: "upper", type: "strength", direction: "higher"},
-    {name: "Handstand Push-Ups (Against Wall)", unit: "reps", best: 12, body: "upper", type: "strength", direction: "higher"},
-    {name: "Lateral Raises (Dumbbell: 18kg)", unit: "reps", best: 15, body: "upper", type: "strength", direction: "higher"},
-    {name: "Resistance Band Face Pulls", unit: "reps", best: 60, body: "upper", type: "endurance", direction: "higher"},
+    {name: "Handstand Push-Ups (Wall)", unit: "reps", best: 12, body: "upper", type: "strength", direction: "higher"},
     {name: "Bicep Curls (Barbell: 36kg)", unit: "reps", best: 20, body: "upper", type: "strength", direction: "higher"},
-
-    // --- LOWER BODY: STRENGTH & POWER ---
-    {name: "Pistol Squats (Single Leg)", unit: "reps", best: 20, body: "lower", type: "strength", direction: "higher"},
-    {name: "Walking Lunges (Vest + 2x18kg DB)", unit: "reps", best: 40, body: "lower", type: "strength", direction: "higher"},
-    {name: "Bulgarian Split Squat (Vest: 20kg)", unit: "reps", best: 30, body: "lower", type: "strength", direction: "higher"},
-    {name: "Goblet Squat (Dumbbell: 18kg)", unit: "reps", best: 60, body: "lower", type: "endurance", direction: "higher"},
-    {name: "Barbell Squat (Max Speed - 36kg)", unit: "reps", best: 50, body: "lower", type: "speed", direction: "higher"},
-    {name: "Broad Jump (Standing)", unit: "minutes", best: 0.05, body: "lower", type: "speed", direction: "higher"}, // Stored as decimal (3m jump)
+    {name: "Pistol Squats", unit: "reps", best: 20, body: "lower", type: "strength", direction: "higher"},
+    {name: "Walking Lunges (Vest+DBs)", unit: "reps", best: 40, body: "lower", type: "strength", direction: "higher"},
+    {name: "Bulgarian Split Squat (Vest)", unit: "reps", best: 30, body: "lower", type: "strength", direction: "higher"},
+    {name: "Barbell Squat (Explosive 36kg)", unit: "reps", best: 50, body: "lower", type: "speed", direction: "higher"},
+    {name: "Broad Jump (Distance)", unit: "minutes", best: 3.05, body: "lower", type: "speed", direction: "higher"},
     {name: "Box Jumps (Max Height)", unit: "reps", best: 40, body: "lower", type: "speed", direction: "higher"},
-    {name: "Glute Bridge (Barbell: 36kg)", unit: "reps", best: 100, body: "lower", type: "endurance", direction: "higher"},
-    {name: "Single Leg Calf Raises (Vest: 20kg)", unit: "reps", best: 30, body: "lower", type: "strength", direction: "higher"},
-    {name: "Resistance Band Leg Curls", unit: "reps", best: 50, body: "lower", type: "endurance", direction: "higher"},
-
-    // --- CORE & STABILITY ---
-    {name: "Hanging Leg Raises (Strict)", unit: "reps", best: 25, body: "core", type: "strength", direction: "higher"},
+    {name: "Hanging Leg Raises", unit: "reps", best: 25, body: "core", type: "strength", direction: "higher"},
     {name: "L-Sit Hold", unit: "minutes", best: 1, body: "core", type: "strength", direction: "higher"},
     {name: "Weighted Plank (Vest: 20kg)", unit: "minutes", best: 5, body: "core", type: "endurance", direction: "higher"},
-    {name: "Hollow Body Rock", unit: "reps", best: 100, body: "core", type: "endurance", direction: "higher"},
     {name: "Dragon Flag Negatives", unit: "reps", best: 10, body: "core", type: "strength", direction: "higher"},
-    {name: "Russian Twists (Vest: 20kg)", unit: "reps", best: 80, body: "core", type: "endurance", direction: "higher"},
-    {name: "Dead Bug (Slow Tempo)", unit: "reps", best: 50, body: "core", type: "endurance", direction: "higher"},
-
-    // --- CARDIO & PERFORMANCE ---
-    {name: "5km Run (High Altitude)", unit: "minutes", best: 19, body: "cardio", type: "endurance", direction: "lower"},
-    {name: "100m Sprint (Full Power)", unit: "minutes", best: 0.19, body: "cardio", type: "speed", direction: "lower"}, // 11.5s
-    {name: "Burpees (Max in 5 mins)", unit: "reps", best: 100, body: "cardio", type: "speed", direction: "higher"},
-    {name: "Mountain Climbers (2 Mins)", unit: "reps", best: 250, body: "cardio", type: "speed", direction: "higher"},
-    {name: "Shadow Boxing (High Intensity)", unit: "minutes", best: 15, body: "cardio", type: "endurance", direction: "higher"},
-    {name: "Jump Rope (Double Unders)", unit: "reps", best: 50, body: "cardio", type: "speed", direction: "higher"},
-
-    // --- GOLF SPECIFIC (ROTATION & EXPLOSION) ---
-    {name: "Band Assisted Swing Speed", unit: "reps", best: 130, body: "core", type: "speed", direction: "higher"},
+    {name: "5km Run", unit: "minutes", best: 19, body: "cardio", type: "endurance", direction: "lower"},
+    {name: "100m Sprint", unit: "minutes", best: 0.19, body: "cardio", type: "speed", direction: "lower"},
+    {name: "Burpees (5 Min Max)", unit: "reps", best: 100, body: "cardio", type: "speed", direction: "higher"},
+    {name: "Band Swing Speed", unit: "reps", best: 130, body: "core", type: "speed", direction: "higher"},
     {name: "Rotational Band Slams", unit: "reps", best: 60, body: "core", type: "speed", direction: "higher"},
-    {name: "Overhead Barbell Reverse Lunge", unit: "reps", best: 20, body: "lower", type: "strength", direction: "higher"},
-    {name: "Cossack Squats (Vest: 20kg)", unit: "reps", best: 24, body: "lower", type: "strength", direction: "higher"},
-    {name: "Wrist Rollers (Forearm Power)", unit: "reps", best: 10, body: "upper", type: "strength", direction: "higher"},
-
-    // --- JAVELIN LEGACY (PEAK PERFORMANCE) ---
-    {name: "Overhead Vest Throw (For Distance)", unit: "reps", best: 20, body: "upper", type: "speed", direction: "higher"},
-    {name: "Single Arm Band Pulls (Fast)", unit: "reps", best: 100, body: "upper", type: "speed", direction: "higher"},
-    {name: "Plyometric Push-Ups", unit: "reps", best: 30, body: "upper", type: "speed", direction: "higher"},
-    {name: "Tuck Jumps (Max Reps in 1m)", unit: "reps", best: 60, body: "lower", type: "speed", direction: "higher"},
-    {name: "Vertical Jump (Peak Height)", unit: "minutes", best: 0.015, body: "lower", type: "speed", direction: "higher"} // ~0.9m
+    {name: "Plyometric Push-Ups", unit: "reps", best: 30, body: "upper", type: "speed", direction: "higher"}
 ];
 
-let state = JSON.parse(localStorage.getItem('sovereign_vfinal') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"path":"none","boss":null,"protocols":[]}');
+let state = JSON.parse(localStorage.getItem('sovereign_at_home_v1') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"path":"none","boss":null,"protocols":[]}');
 
-// SEED LOGIC: If no exercises exist, add the pre-loaded ones.
 if (state.exercises.length === 0) {
-    SEED_EXERCISES.forEach((ex, index) => {
-        state.exercises.push({...ex, id: Date.now() + index, pb: null});
-    });
+    SEED_EXERCISES.forEach((ex, i) => state.exercises.push({...ex, id: Date.now() + i, pb: null}));
     save();
 }
 
-function save(){ localStorage.setItem('sovereign_vfinal', JSON.stringify(state)); }
+function save(){ localStorage.setItem('sovereign_at_home_v1', JSON.stringify(state)); }
 
 // --- HELPERS ---
-function formatVal(v,u){ if(u!=='minutes') return v; let s=Math.round(v*60); return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`; }
+function formatVal(v,u){ if(u!=='minutes' || isNaN(v) || v === null) return v; let s=Math.round(v*60); return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`; }
 function getPct(ex,v){ return ex.direction==='lower' ? Math.round((ex.best/v)*100) : Math.round((v/ex.best)*100); }
-function getRank(p){ if(p>=100)return'SSS';if(p>=85)return'SS';if(p>=70)return'S';if(p>=55)return'A';if(p>=40)return'B';if(p>=25)return'C';return'F';}
+function getRank(p){ if(p>=100)return'SSS';if(p>=85)return'SS';if(p>=70)return'S';if(p>=55)return'A';if(p>=40)return'B';return'F';}
 function rankToNum(r){return{F:0,C:1,B:2,A:3,S:4,SS:5,SSS:6}[r]??0;}
 function numToRank(n){return['F','C','B','A','S','SS','SSS'][Math.min(6,Math.round(n))];}
 const RC={F:'#555',C:'#2e6b3e',B:'#1a5f8a',A:'#6a2ea0',S:'#c8a92e',SS:'#e07830',SSS:'#cc2040'};
@@ -403,7 +372,12 @@ function addExercise(){
 function renderExercises(){
     document.getElementById('exercise-list').innerHTML=state.exercises.map(ex=>`
     <div class="exercise-card">
-        <div class="exercise-info"><h3>${ex.name}</h3><span class="unit">Best: ${formatVal(ex.pb||0,ex.unit)}</span><br><span class="history-link" onclick="showHistory(${ex.id})">Chronology</span></div>
+        <div class="exercise-info">
+            <h3>${ex.name}</h3>
+            <div class="benchmark-text">SSS Benchmark: <strong>${formatVal(ex.best, ex.unit)}</strong></div>
+            ${ex.pb ? `<div class="pb-text">Personal Best: ${formatVal(ex.pb, ex.unit)}</div>` : ''}
+            <span class="history-link" onclick="showHistory(${ex.id})">Progression Chart</span>
+        </div>
         <div class="exercise-actions">
             <button class="btn btn-small" onclick="editEx(${ex.id})">Edit</button>
             <button class="btn btn-danger btn-small" onclick="delEx(${ex.id})">Del</button>
@@ -479,8 +453,7 @@ function deleteLog(id){
 const FEATS=[
     {id:'f1', icon:'⚔️', name:'First Step', desc:'Log 1 session.', check:s=>s.logs.length>=1},
     {id:'f2', icon:'🔥', name:'Dedicated', desc:'Log 10 sessions.', check:s=>s.logs.length>=10},
-    {id:'f3', icon:'👑', name:'Sovereign', desc:'Achieve S Rank.', check:s=>s.logs.some(l=>{let e=s.exercises.find(x=>x.id==l.exId); return e&&getPct(e,l.val)>=70})},
-    {id:'boss_slayer', icon:'👹', name:'Slayer', desc:'Defeat a Boss.', check:s=>s.unlockedAchs['boss_slayer']}
+    {id:'f3', icon:'👑', name:'Sovereign', desc:'Achieve S Rank.', check:s=>s.logs.some(l=>{let e=s.exercises.find(x=>x.id==l.exId); return e&&getPct(e,l.val)>=70})}
 ];
 function checkAchs(){ FEATS.forEach(f=>{if(!state.unlockedAchs[f.id]&&f.check(state)){state.unlockedAchs[f.id]=Date.now(); showToast({icon:f.icon,name:f.name});}}); save();}
 function resetAch(id){ if(confirm("Reset feat?")){delete state.unlockedAchs[id]; save(); renderAchievements();}}
@@ -506,7 +479,7 @@ function loadProtoEx(){
 
 // --- SYSTEM ---
 let tI;
-function startTimer(){ let l=90; clearInterval(tI); tI=setInterval(()=>{l--; document.getElementById('timer-clock').textContent=`0${Math.floor(l/60)}:${(l%60).toString().padStart(2,'0')}`; if(l<=0){clearInterval(tI);playSound('powerUp');}},1000);}
+function startTimer(){ let l=90; clearInterval(tI); tI=setInterval(()=>{l--; document.getElementById('timer-clock').textContent=`0${Math.floor(l/60)}:${(l%60).toString().padStart(2,'0')}`; if(l<=0){clearInterval(tI);playSound('click');}},1000);}
 function switchTab(n,e){
     playSound('click'); document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('view-'+n).classList.add('active'); e.classList.add('active');
     if(n==='character'){renderCharacter(); renderRadar();} if(n==='achievements')renderAchievements(); if(n==='protocols')renderProtocols(); if(n==='log')renderLogView();
@@ -525,9 +498,6 @@ function renderCharacter(){
 function closeModal(){ document.getElementById('result-modal').classList.remove('open'); clearInterval(tI); }
 function showToast(a){ let e=document.createElement('div'); e.className='toast show'; e.innerHTML=`<span>${a.icon}</span><div>${a.name}</div>`; document.getElementById('toast-wrap').appendChild(e); setTimeout(()=>e.remove(),3000);}
 function exportData(){ let b=new Blob([JSON.stringify(state)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='sovereign.json'; a.click();}
-function importData(e) {
-  const r = new FileReader(); r.onload = (ev) => { state = JSON.parse(ev.target.result); save(); location.reload(); }; r.readAsText(e.target.files[0]);
-}
 
 // INIT
 document.getElementById('log-date').value=new Date().toISOString().split('T')[0];
