@@ -20,8 +20,15 @@
     --bg:#070710; --bg2:#0d0d1a; --bg3:#12122a;
     --panel:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.07);
     --accent:#c8a96e; --accent2:#7b5ea7; --text:#e8e0d0; --muted:#6b6a7a;
-    --rank-f:#555; --rank-d:#7a4f2a; --rank-c:#2e6b3e; --rank-b:#1a5f8a;
-    --rank-a:#6a2ea0; --rank-s:#c8a92e; --rank-ss:#e07830; --rank-sss:#cc2040;
+    /* RANK COLORS */
+    --rank-f:#555555; /* Stone Grey */
+    --rank-c:#2e6b3e; /* Forest Green */
+    --rank-b:#1a5f8a; /* Deep Blue */
+    --rank-a:#6a2ea0; /* Royal Purple */
+    --rank-s:#c8a92e; /* Gold */
+    --rank-ss:#e07830; /* Orange Blaze */
+    --rank-sss:#cc2040; /* Crimson Glow */
+    
     --glow-s:0 0 20px rgba(200,169,46,0.6);
     --glow-sss:0 0 25px rgba(204,32,64,0.8);
   }
@@ -68,7 +75,7 @@
   .btn-full{width:100%;margin-top:16px;}
   .btn-small { padding: 6px 0; font-size: 9px; width: 100%; text-align: center; }
 
-  /* EXERCISE LAYOUT 20/80 */
+  /* EXERCISE CARDS */
   .exercise-list{display:flex;flex-direction:column;gap:12px;}
   .exercise-card{
     background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:2px; padding:14px 18px;
@@ -80,13 +87,23 @@
   .benchmark-text {font-size: 11px; color: var(--muted); margin-top: 4px;}
   .pb-text {font-size: 11px; color: var(--accent); font-weight: bold;}
 
+  /* LOG ENTRY */
   .log-entry{
     display:grid; grid-template-columns: auto 1fr auto auto; align-items:center; gap:14px; padding:10px 14px;
     background:rgba(255,255,255,0.02); border:1px solid var(--border); margin-bottom:8px; font-size:14px;
+    border-left: 3px solid transparent; /* Placeholder for rank borders */
   }
 
+  /* RANK STYLING */
   .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:12px;border-radius:2px;border:2px solid;}
-  .rank-SSS{box-shadow:var(--glow-sss); animation: pulse-sss 2s infinite;}
+  .rank-F{color:var(--rank-f); border-color:var(--rank-f); background:rgba(85,85,85,0.05);}
+  .rank-C{color:var(--rank-c); border-color:var(--rank-c); background:rgba(46,107,62,0.05);}
+  .rank-B{color:var(--rank-b); border-color:var(--rank-b); background:rgba(26,95,138,0.05);}
+  .rank-A{color:var(--rank-a); border-color:var(--rank-a); background:rgba(106,46,160,0.05);}
+  .rank-S{color:var(--rank-s); border-color:var(--rank-s); background:rgba(200,169,46,0.05); box-shadow:var(--glow-s);}
+  .rank-SS{color:var(--rank-ss); border-color:var(--rank-ss); background:rgba(224,120,48,0.05);}
+  .rank-SSS{color:var(--rank-sss); border-color:var(--rank-sss); background:rgba(204,32,64,0.05); box-shadow:var(--glow-sss); animation: pulse-sss 2s infinite;}
+  
   @keyframes pulse-sss { 0%,100% {opacity:1;} 50% {opacity:0.7;} }
 
   .radar-wrap { width: 100%; max-width: 400px; margin: 0 auto; }
@@ -275,19 +292,19 @@ const SEED_EXERCISES = [
     {name: "Plyometric Push-Ups", unit: "reps", best: 30, body: "upper", type: "speed", direction: "higher"}
 ];
 
-let state = JSON.parse(localStorage.getItem('sovereign_at_home_v1') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"path":"none","boss":null,"protocols":[]}');
+let state = JSON.parse(localStorage.getItem('sovereign_at_home_v2') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"path":"none","boss":null,"protocols":[]}');
 
 if (state.exercises.length === 0) {
     SEED_EXERCISES.forEach((ex, i) => state.exercises.push({...ex, id: Date.now() + i, pb: null}));
     save();
 }
 
-function save(){ localStorage.setItem('sovereign_at_home_v1', JSON.stringify(state)); }
+function save(){ localStorage.setItem('sovereign_at_home_v2', JSON.stringify(state)); }
 
 // --- HELPERS ---
 function formatVal(v,u){ if(u!=='minutes' || isNaN(v) || v === null) return v; let s=Math.round(v*60); return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`; }
 function getPct(ex,v){ return ex.direction==='lower' ? Math.round((ex.best/v)*100) : Math.round((v/ex.best)*100); }
-function getRank(p){ if(p>=100)return'SSS';if(p>=85)return'SS';if(p>=70)return'S';if(p>=55)return'A';if(p>=40)return'B';return'F';}
+function getRank(p){ if(p>=100)return'SSS';if(p>=85)return'SS';if(p>=70)return'S';if(p>=55)return'A';if(p>=40)return'B';if(p>=25)return'C';return'F';}
 function rankToNum(r){return{F:0,C:1,B:2,A:3,S:4,SS:5,SSS:6}[r]??0;}
 function numToRank(n){return['F','C','B','A','S','SS','SSS'][Math.min(6,Math.round(n))];}
 const RC={F:'#555',C:'#2e6b3e',B:'#1a5f8a',A:'#6a2ea0',S:'#c8a92e',SS:'#e07830',SSS:'#cc2040'};
@@ -430,7 +447,8 @@ function renderHistory(){
     const sorted=[...state.logs].sort((a,b)=>b.ts-a.ts).slice(0, 20);
     document.getElementById('log-history').innerHTML=sorted.map(l=>{
         const ex=state.exercises.find(e=>e.id==l.exId); if(!ex)return'';
-        return `<div class="log-entry">
+        const p = getPct(ex, l.val); const r = getRank(p);
+        return `<div class="log-entry" style="border-left: 3px solid ${RC[r]};">
             <div style="font-size:10px; color:var(--muted)">${new Date(l.ts).toLocaleDateString()}</div>
             <div class="log-name">${ex.name}</div>
             <div style="text-align:right"><strong>${formatVal(l.val,ex.unit)}</strong></div>
@@ -439,7 +457,7 @@ function renderHistory(){
     }).join('');
 }
 function deleteLog(id){
-    if(confirm("Delete this memory?")){
+    if(confirm("Delete memory?")){
         state.logs=state.logs.filter(l=>l.id!==id);
         state.exercises.forEach(ex=>{
             let eL=state.logs.filter(l=>l.exId===ex.id);
@@ -453,7 +471,8 @@ function deleteLog(id){
 const FEATS=[
     {id:'f1', icon:'⚔️', name:'First Step', desc:'Log 1 session.', check:s=>s.logs.length>=1},
     {id:'f2', icon:'🔥', name:'Dedicated', desc:'Log 10 sessions.', check:s=>s.logs.length>=10},
-    {id:'f3', icon:'👑', name:'Sovereign', desc:'Achieve S Rank.', check:s=>s.logs.some(l=>{let e=s.exercises.find(x=>x.id==l.exId); return e&&getPct(e,l.val)>=70})}
+    {id:'f3', icon:'👑', name:'Sovereign', desc:'Achieve S Rank.', check:s=>s.logs.some(l=>{let e=s.exercises.find(x=>x.id==l.exId); return e&&getPct(e,l.val)>=70})},
+    {id:'f4', icon:'👹', name:'Slayer', desc:'Defeat a Boss.', check:s=>s.unlockedAchs['boss_slayer']}
 ];
 function checkAchs(){ FEATS.forEach(f=>{if(!state.unlockedAchs[f.id]&&f.check(state)){state.unlockedAchs[f.id]=Date.now(); showToast({icon:f.icon,name:f.name});}}); save();}
 function resetAch(id){ if(confirm("Reset feat?")){delete state.unlockedAchs[id]; save(); renderAchievements();}}
@@ -490,7 +509,7 @@ function renderLogView(){
 }
 function renderCharacter(){
     let exR=state.exercises.map(ex=>{let p=ex.pb?getPct(ex,ex.pb):0; return{ex,p,rank:getRank(p)}});
-    document.getElementById('char-stats').innerHTML=exR.map(r=>`<div class="log-entry"><div class="rank-badge rank-${r.rank}" style="width:30px;height:30px;font-size:10px">${r.rank}</div><div>${r.ex.name}</div><div style="text-align:right">${formatVal(r.ex.pb,r.ex.unit)}</div></div>`).join('');
+    document.getElementById('char-stats').innerHTML=exR.map(r=>`<div class="log-entry" style="border-left: 3px solid ${RC[r.rank]}"><div class="rank-badge rank-${r.rank}" style="width:30px;height:30px;font-size:10px">${r.rank}</div><div>${r.ex.name}</div><div style="text-align:right">${formatVal(r.ex.pb,r.ex.unit)}</div></div>`).join('');
     let upperR=exR.filter(r=>r.ex.body==='upper'), allR=exR.length?exR.map(r=>rankToNum(r.rank)).reduce((a,b)=>a+b,0)/exR.length:0;
     document.getElementById('stat-golf').textContent=numToRank(allR);
     document.getElementById('stat-javelin').textContent=numToRank(upperR.length?upperR.map(r=>rankToNum(r.rank)).reduce((a,b)=>a+b,0)/upperR.length:0);
@@ -498,6 +517,9 @@ function renderCharacter(){
 function closeModal(){ document.getElementById('result-modal').classList.remove('open'); clearInterval(tI); }
 function showToast(a){ let e=document.createElement('div'); e.className='toast show'; e.innerHTML=`<span>${a.icon}</span><div>${a.name}</div>`; document.getElementById('toast-wrap').appendChild(e); setTimeout(()=>e.remove(),3000);}
 function exportData(){ let b=new Blob([JSON.stringify(state)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='sovereign.json'; a.click();}
+function importData(e) {
+  const r = new FileReader(); r.onload = (ev) => { state = JSON.parse(ev.target.result); save(); location.reload(); }; r.readAsText(e.target.files[0]);
+}
 
 // INIT
 document.getElementById('log-date').value=new Date().toISOString().split('T')[0];
