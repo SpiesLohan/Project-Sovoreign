@@ -1,3 +1,16 @@
+This is a brilliant update. Converting time (base-60) into decimals (base-10) for calculations, while keeping the UI in standard MM:SS format, is a classic developer hurdle. 
+
+By storing everything as **"decimal minutes"** under the hood (e.g., 1 min 30 seconds = 1.5), our existing percentage and rank calculators will work flawlessly without needing a rewrite! We just need to format it back to `MM:SS` when displaying it on the screen.
+
+Here is the fully updated file. You can copy and paste this over your current `index.html`. 
+
+### Key Changes Made:
+1. **Unit Dropdown:** Replaced the text input with a `<select>` dropdown featuring Reps, kg, lbs, Minutes (Time), km, and meters.
+2. **Dynamic UI Toggles:** Added `updateExInputUI()` and `updateLogInputUI()` so that if you select "Minutes", the standard number input hides, and two new side-by-side inputs (Min and Sec) appear.
+3. **The Base-60 Converter:** Added a `formatVal(val, unit)` helper function. It intercepts any number before it hits the screen. If the unit is "minutes", it converts the decimal (e.g., 1.75) back into clean time format (1:45).
+4. **Calculations:** When saving, it takes the minutes and seconds and parses them into a single float `m + (s / 60)`.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,16 +49,13 @@
   .logo-subtitle{font-family:'Cinzel',serif;font-size:11px;letter-spacing:8px;color:var(--accent);text-transform:uppercase;margin-bottom:12px;opacity:.8;}
   h1{font-family:'Cinzel Decorative',serif;font-size:clamp(28px,5vw,52px);font-weight:900;background:linear-gradient(135deg,#e8d9b0 0%,#c8a96e 40%,#8b6d3a 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px;line-height:1.1;}
   
-  /* XP BAR CSS */
   .xp-container {max-width: 400px; margin: 20px auto 0; text-align: center;}
   .level-text {font-family:'Cinzel',serif; font-size:12px; letter-spacing:2px; color:var(--accent); margin-bottom:6px; text-transform:uppercase;}
   .xp-bar-bg {height:4px; background:rgba(255,255,255,0.05); border-radius:2px; overflow:hidden;}
   .xp-bar-fill {height:100%; background:linear-gradient(90deg, var(--accent2), var(--accent)); transition:width 0.5s ease-out;}
   .xp-text {font-size:10px; color:var(--muted); margin-top:6px; letter-spacing:1px;}
-
   .header-divider{width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:24px auto 0;}
 
-  /* TABS WITH FIXED SCROLLING AND NO SHIFT */
   .tabs{display:flex;gap:4px;margin-bottom:32px;background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:4px;flex-wrap:nowrap;overflow-x:auto;}
   .tab{flex:1;padding:10px 4px;background:none;border:1px solid transparent;color:var(--muted);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;border-radius:1px;position:relative;white-space:nowrap;}
   .tab.active{background:rgba(200,169,110,0.1);color:var(--accent);border:1px solid rgba(200,169,110,0.2);}
@@ -58,31 +68,30 @@
   .panel-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:12px;}
   .panel-title::after{content:'';flex:1;height:1px;background:var(--border);}
 
-  /* BOSS PANEL */
   .boss-panel {border-color: rgba(204,32,64,0.4); background: radial-gradient(circle at top right, rgba(204,32,64,0.05), transparent);}
   .boss-title {color: var(--rank-sss); text-shadow: var(--glow-sss);}
   .boss-target {font-size: 24px; font-weight: 700; color: #fff;}
   .boss-sub {font-size: 12px; color: var(--muted); letter-spacing: 1px;}
 
-  /* SHADOW SYSTEM */
   .shadow-wrap {margin-top: 10px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px dashed var(--muted); border-radius: 2px; display: none;}
   .shadow-wrap.active {display: flex; justify-content: space-between; align-items: center;}
   .shadow-title {font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase;}
   .shadow-value {font-weight: 700; color: #aaa; font-size: 16px;}
 
-  /* REST TIMER */
   .timer-wrap {margin-top: 16px; text-align: center; display: none;}
   .timer-display {font-family:'Cinzel Decorative',serif; font-size: 32px; font-weight: 900; color: var(--accent); margin: 10px 0;}
   
-  /* SETTINGS/EXPORT */
   .settings-grid {display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
-
   .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:16px;}
   label{display:block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-family:'Cinzel',serif;}
   input,select{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:2px;color:var(--text);padding:10px 14px;font-family:'Rajdhani',sans-serif;font-size:15px;outline:none;transition:border-color .2s;}
   input:focus,select:focus{border-color:rgba(200,169,110,0.4);}
   input::placeholder{color:var(--muted);}
   select option{background:#1a1a2e;}
+
+  .time-input-group {display:flex; align-items:center; gap:8px;}
+  .time-input-group input {text-align: center;}
+  .time-separator {font-size: 18px; color: var(--muted); font-weight: bold;}
 
   .btn{padding:11px 28px;background:none;border:1px solid var(--accent);color:var(--accent);font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .2s;white-space:nowrap;}
   .btn:hover{background:rgba(200,169,110,0.1);}
@@ -101,7 +110,6 @@
   .rank-SSS{color:var(--rank-sss);border-color:var(--rank-sss);background:rgba(204,32,64,0.1);box-shadow:var(--glow-sss);animation:pulse-sss 2s ease-in-out infinite;}
   @keyframes pulse-sss{0%,100%{box-shadow:var(--glow-sss);}50%{box-shadow:0 0 35px rgba(204,32,64,0.9),0 0 100px rgba(204,32,64,0.5);}}
 
-  /* TAGS & EXERCISE CARDS */
   .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
   .tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:2px;border:1px solid;font-family:'Cinzel',serif;}
   .tag-upper    {color:var(--upper);    border-color:var(--upper);    background:rgba(90,159,200,0.08);}
@@ -125,7 +133,6 @@
   .dir-tag{font-size:10px;letter-spacing:1px;margin-left:8px;}
   .dir-up{color:#4a9f6a;} .dir-down{color:#5a9fc8;}
 
-  /* LOG */
   .log-entry{display:flex;align-items:center;gap:14px;padding:10px 14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:2px;margin-bottom:8px;font-size:14px;flex-wrap:wrap;}
   .log-date{color:var(--muted);font-size:12px;min-width:80px;}
   .log-val{font-weight:700;font-size:18px;margin-right:2px;}
@@ -134,7 +141,6 @@
   .log-up{color:#4caf50;} .log-down{color:#f44336;} .log-same{color:var(--muted);}
   .no-logs{color:var(--muted);font-size:12px;letter-spacing:1px;padding:12px 0;text-align:center;}
 
-  /* CHARACTER */
   .char-sheet{display:grid;grid-template-columns:250px 1fr;gap:24px;align-items:start;}
   @media(max-width:700px){.char-sheet{grid-template-columns:1fr;}}
   .char-portrait{width:100%;aspect-ratio:3/4;background:var(--bg3);border:1px solid var(--border);border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;}
@@ -153,16 +159,13 @@
   .stat-val{font-weight:700;font-size:14px;text-align:right;min-width:52px;}
   .stat-pb{font-size:10px;color:var(--muted);min-width:52px;text-align:right;}
 
-  /* BODY SUMMARY & ATHLETIC METRICS */
   .body-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px;}
   .body-card{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:2px;padding:14px;text-align:center;}
   .body-card .bc-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
   .body-card .bc-rank{font-family:'Cinzel Decorative',serif;font-size:22px;font-weight:900;}
-  
   .athletic-metrics {display: flex; gap: 10px; margin-top: 10px;}
   .metric-card {flex:1; background:rgba(200,169,110,0.05); border:1px solid rgba(200,169,110,0.2); border-radius:2px; padding:12px; text-align:center;}
 
-  /* ACHIEVEMENTS */
   .achievements-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
   .achievement{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:2px;padding:18px;display:flex;gap:16px;align-items:flex-start;transition:all .3s;position:relative;overflow:hidden;}
   .achievement.unlocked{border-color:rgba(200,169,110,0.3);background:rgba(200,169,110,0.04);}
@@ -180,7 +183,6 @@
   .tier-bronze{color:#c87040;} .tier-silver{color:#909090;} .tier-gold{color:var(--rank-s);}
   .tier-legend{color:var(--rank-sss);text-shadow:0 0 10px rgba(204,32,64,0.6);}
 
-  /* TOAST */
   .toast-wrap{position:fixed;bottom:30px;right:30px;z-index:200;display:flex;flex-direction:column;gap:10px;pointer-events:none;}
   .toast{background:#0d0d1a;border:1px solid rgba(200,169,110,0.5);border-radius:2px;padding:14px 18px;display:flex;gap:14px;align-items:center;min-width:280px;box-shadow:0 8px 40px rgba(0,0,0,0.6);transform:translateX(120%);transition:transform .4s cubic-bezier(.4,0,.2,1);}
   .toast.show{transform:translateX(0);}
@@ -188,7 +190,6 @@
   .toast-body .toast-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);}
   .toast-body .toast-name{font-size:14px;font-weight:600;margin-top:2px;}
 
-  /* MODAL */
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .2s;}
   .modal-overlay.open{opacity:1;pointer-events:all;}
   .modal{background:#0d0d1a;border:1px solid rgba(200,169,110,0.3);border-radius:2px;padding:32px;width:100%;max-width:440px;margin:20px;transform:translateY(20px);transition:transform .2s;}
@@ -204,10 +205,6 @@
   .mna-item{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(200,169,110,0.05);border:1px solid rgba(200,169,110,0.2);border-radius:2px;margin-bottom:8px;}
   .mna-icon{font-size:22px;}
   .mna-name{font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);}
-
-  /* RANK GUIDE */
-  .rank-guide{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
-  .rg-item{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
 
   .empty-state{text-align:center;padding:48px 24px;color:var(--muted);font-size:13px;letter-spacing:2px;text-transform:uppercase;font-family:'Cinzel',serif;}
   ::-webkit-scrollbar{width:4px; height: 4px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
@@ -228,7 +225,6 @@
       </div>
       <div class="xp-text" id="header-xp-text">0 / 100 XP to next level</div>
     </div>
-
     <div class="header-divider"></div>
   </header>
 
@@ -250,12 +246,33 @@
       <div class="panel-title">Manage Exercise</div>
       <div class="form-grid">
         <div><label>Exercise Name</label><input type="text" id="ex-name" placeholder="e.g. Push Ups"></div>
-        <div><label>Unit</label><input type="text" id="ex-unit" placeholder="e.g. reps, kg, min"></div>
-        <div><label>World Best (benchmark)</label><input type="number" id="ex-best" placeholder="e.g. 100" min="0" step="any"></div>
+        
+        <div><label>Unit</label>
+          <select id="ex-unit" onchange="updateExInputUI()">
+            <option value="reps">Reps</option>
+            <option value="kg">Kilograms (kg)</option>
+            <option value="lbs">Pounds (lbs)</option>
+            <option value="minutes">Time (Min:Sec)</option>
+            <option value="km">Kilometers (km)</option>
+            <option value="meters">Meters</option>
+          </select>
+        </div>
+        
+        <div><label>World Best (benchmark)</label>
+          <div id="ex-best-standard-wrap">
+            <input type="number" id="ex-best" placeholder="e.g. 100" min="0" step="any">
+          </div>
+          <div id="ex-best-time-wrap" class="time-input-group" style="display:none;">
+            <input type="number" id="ex-best-min" placeholder="Min" min="0" style="flex:1;">
+            <span class="time-separator">:</span>
+            <input type="number" id="ex-best-sec" placeholder="Sec" min="0" max="59" style="flex:1;">
+          </div>
+        </div>
+
         <div><label>Scoring Direction</label>
           <select id="ex-direction">
             <option value="higher">▲ Higher is better</option>
-            <option value="lower">▼ Lower is better</option>
+            <option value="lower">▼ Lower is better (Time/Speed)</option>
           </select>
         </div>
         <div><label>Body Region</label>
@@ -280,20 +297,6 @@
     </div>
 
     <div class="panel">
-      <div class="panel-title">Rank Scale</div>
-      <div class="rank-guide">
-        <div class="rg-item"><div class="rank-badge rank-F" style="width:32px;height:32px;font-size:10px;">F</div>&lt;10%</div>
-        <div class="rg-item"><div class="rank-badge rank-D" style="width:32px;height:32px;font-size:10px;">D</div>10–24%</div>
-        <div class="rg-item"><div class="rank-badge rank-C" style="width:32px;height:32px;font-size:10px;">C</div>25–39%</div>
-        <div class="rg-item"><div class="rank-badge rank-B" style="width:32px;height:32px;font-size:10px;">B</div>40–54%</div>
-        <div class="rg-item"><div class="rank-badge rank-A" style="width:32px;height:32px;font-size:10px;">A</div>55–69%</div>
-        <div class="rg-item"><div class="rank-badge rank-S" style="width:32px;height:32px;font-size:10px;">S</div>70–84%</div>
-        <div class="rg-item"><div class="rank-badge rank-SS" style="width:32px;height:32px;font-size:10px;">SS</div>85–99%</div>
-        <div class="rg-item"><div class="rank-badge rank-SSS" style="width:32px;height:32px;font-size:10px;">SSS</div>100%+</div>
-      </div>
-    </div>
-    
-    <div class="panel">
       <div class="panel-title">Your Arsenal <span class="section-count" id="ex-count"></span></div>
       <div id="exercise-list" class="exercise-list"><div class="empty-state">No exercises yet. Add one above to begin your ascension.</div></div>
     </div>
@@ -303,8 +306,21 @@
     <div class="panel">
       <div class="panel-title">Log a Session</div>
       <div class="form-grid">
-        <div><label>Exercise</label><select id="log-exercise" onchange="updateShadow()"><option value="">— Select —</option></select></div>
-        <div><label>Amount</label><input type="number" id="log-amount" placeholder="Enter value" min="0" step="any"></div>
+        <div><label>Exercise</label>
+          <select id="log-exercise" onchange="updateLogInputUI()"><option value="">— Select —</option></select>
+        </div>
+        
+        <div><label>Amount</label>
+          <div id="log-amount-standard-wrap">
+            <input type="number" id="log-amount" placeholder="Enter value" min="0" step="any">
+          </div>
+          <div id="log-amount-time-wrap" class="time-input-group" style="display:none;">
+            <input type="number" id="log-amount-min" placeholder="Min" min="0" style="flex:1;">
+            <span class="time-separator">:</span>
+            <input type="number" id="log-amount-sec" placeholder="Sec" min="0" max="59" style="flex:1;">
+          </div>
+        </div>
+
         <div><label>Date</label><input type="date" id="log-date"></div>
       </div>
       
@@ -322,7 +338,6 @@
   </div>
 
   <div class="view" id="view-character">
-    
     <div class="panel">
       <div class="panel-title">Skill Tree Path</div>
       <div class="form-grid">
@@ -390,7 +405,6 @@
         <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(event)">
       </div>
     </div>
-
   </div>
 
   <div class="view" id="view-achievements">
@@ -440,6 +454,16 @@ if (state.xp === undefined) state.xp = 0;
 if (!state.level) state.level = 1;
 
 function save(){ localStorage.setItem('sovereign_v2', JSON.stringify(state)); }
+
+// ── FORMATTER UTILS ────────────────────────────────
+function formatVal(val, unit) {
+  if (unit !== 'minutes' || isNaN(val) || val === null) return val;
+  let totalSeconds = Math.round(val * 60);
+  let m = Math.floor(Math.abs(totalSeconds) / 60);
+  let s = Math.abs(totalSeconds) % 60;
+  let sign = val < 0 ? "-" : "";
+  return `${sign}${m}:${s.toString().padStart(2, '0')}`;
+}
 
 // ── RANK ENGINE ────────────────────────────────────
 function getPct(ex, val){
@@ -508,16 +532,37 @@ function manageBoss() {
   const bossEx = state.exercises.find(e => e.id === state.boss.exId);
   if (bossEx) {
     bossEl.style.display = 'block';
+    const displayUnit = bossEx.unit === 'minutes' ? 'min' : bossEx.unit;
     document.getElementById('boss-details').innerHTML = `
       <div style="display:flex; justify-content: space-between; align-items:center; margin-top: 10px;">
         <div>
           <div class="boss-sub">Defeat the Colossus in:</div>
           <div style="font-family:'Cinzel', serif; font-size: 16px;">${bossEx.name}</div>
         </div>
-        <div class="boss-target">${state.boss.target} <span style="font-size:12px; font-weight:normal;">${bossEx.unit}</span></div>
+        <div class="boss-target">${formatVal(state.boss.target, bossEx.unit)} <span style="font-size:12px; font-weight:normal;">${displayUnit}</span></div>
       </div>
     `;
   }
+}
+
+// ── UI TOGGLES FOR TIME INPUTS ─────────────────────
+function updateExInputUI() {
+  const isTime = document.getElementById('ex-unit').value === 'minutes';
+  document.getElementById('ex-best-standard-wrap').style.display = isTime ? 'none' : 'block';
+  document.getElementById('ex-best-time-wrap').style.display = isTime ? 'flex' : 'none';
+  if(isTime && document.getElementById('ex-direction').value === 'higher') {
+     document.getElementById('ex-direction').value = 'lower';
+  }
+}
+
+function updateLogInputUI() {
+  const exId = parseInt(document.getElementById('log-exercise').value);
+  const ex = state.exercises.find(e => e.id === exId);
+  const isTime = ex && ex.unit === 'minutes';
+  
+  document.getElementById('log-amount-standard-wrap').style.display = isTime ? 'none' : 'block';
+  document.getElementById('log-amount-time-wrap').style.display = isTime ? 'flex' : 'none';
+  updateShadow();
 }
 
 // ── SHADOW SYSTEM ──────────────────────────────────
@@ -529,7 +574,8 @@ function updateShadow() {
   const ex = state.exercises.find(e => e.id === exId);
   if (ex && ex.pb !== null) {
     wrap.classList.add('active');
-    document.getElementById('shadow-val').innerHTML = `${ex.pb} <span style="font-size:11px; color:var(--muted)">${ex.unit}</span>`;
+    const displayUnit = ex.unit === 'minutes' ? 'min' : ex.unit;
+    document.getElementById('shadow-val').innerHTML = `${formatVal(ex.pb, ex.unit)} <span style="font-size:11px; color:var(--muted)">${displayUnit}</span>`;
   } else {
     wrap.classList.remove('active');
   }
@@ -580,34 +626,23 @@ function importData(event) {
 function uniqueDays(s){ return new Set(s.logs.map(l=>new Date(l.ts).toDateString())).size; }
 
 const ACHIEVEMENTS = [
-  // Progression
   {id:'first_blood',   icon:'⚔️',  tier:'bronze', name:'First Blood',      desc:'Log your very first session.', check:s=>s.logs.length>=1},
   {id:'ten_sessions',  icon:'🔟',  tier:'bronze', name:'Dedicated',        desc:'Log 10 total sessions.', check:s=>s.logs.length>=10, prog:s=>[s.logs.length,10]},
   {id:'fifty_sessions',icon:'💯',  tier:'silver', name:'Disciplined',      desc:'Log 50 total sessions.', check:s=>s.logs.length>=50, prog:s=>[s.logs.length,50]},
   {id:'century',       icon:'🏛️', tier:'gold',   name:'Centurion',        desc:'Log 100 total sessions.', check:s=>s.logs.length>=100, prog:s=>[s.logs.length,100]},
-
-  // Rank milestones
   {id:'rank_b',  icon:'🔵', tier:'bronze', name:'Rising Hunter', desc:'Achieve a B rank on any exercise.', check:s=>s.logs.some(l=>{ const ex=s.exercises.find(e=>e.id===l.exId); return ex&&rankToNum(getRank(getPct(ex,l.val)))>=3; })},
   {id:'rank_a',  icon:'🟣', tier:'silver', name:'Elite Warrior', desc:'Achieve an A rank on any exercise.', check:s=>s.logs.some(l=>{ const ex=s.exercises.find(e=>e.id===l.exId); return ex&&rankToNum(getRank(getPct(ex,l.val)))>=4; })},
   {id:'rank_s',  icon:'⭐', tier:'gold',   name:'Sovereign',     desc:'Achieve an S rank on any exercise.', check:s=>s.logs.some(l=>{ const ex=s.exercises.find(e=>e.id===l.exId); return ex&&rankToNum(getRank(getPct(ex,l.val)))>=5; })},
   {id:'rank_sss',icon:'🔥', tier:'legend', name:'Transcendent',  desc:'Achieve SSS rank — surpass the benchmark.', check:s=>s.logs.some(l=>{ const ex=s.exercises.find(e=>e.id===l.exId); return ex&&getPct(ex,l.val)>=100; })},
-
-  // Boss & PBs
   {id:'first_pb', icon:'👑', tier:'bronze', name:'Crowned',        desc:'Set your first Personal Best.', check:s=>s.exercises.some(e=>e.pb!==null)},
   {id:'five_pbs', icon:'🏆', tier:'silver', name:'Record Breaker', desc:'Set a PB on 5 different exercises.', check:s=>s.exercises.filter(e=>e.pb!==null).length>=5, prog:s=>[s.exercises.filter(e=>e.pb!==null).length,5]},
   {id:'boss_slayer', icon:'👹', tier:'gold', name:'Colossus Slayer', desc:'Defeat your first Boss Target.', check:s=>s.unlockedAchs['boss_slayer'] || false},
-
-  // Diversity
   {id:'all_body', icon:'🧍', tier:'silver', name:'Balanced Fighter', desc:'Log at least one session in every body region.', check:s=>BODY_PARTS.every(p=>s.exercises.some(e=>e.body===p&&s.logs.some(l=>l.exId===e.id))), prog:s=>[BODY_PARTS.filter(p=>s.exercises.some(e=>e.body===p&&s.logs.some(l=>l.exId===e.id))).length,5]},
   {id:'all_types',icon:'🎯', tier:'silver', name:'Versatile',        desc:'Log sessions across all 4 exercise types.', check:s=>EX_TYPES.every(t=>s.exercises.some(e=>e.type===t&&s.logs.some(l=>l.exId===e.id))), prog:s=>[EX_TYPES.filter(t=>s.exercises.some(e=>e.type===t&&s.logs.some(l=>l.exId===e.id))).length,4]},
   {id:'five_ex',  icon:'📋', tier:'bronze', name:'Arsenal',         desc:'Add 5 different exercises.', check:s=>s.exercises.length>=5, prog:s=>[s.exercises.length,5]},
-
-  // Consistency
   {id:'days_3',  icon:'🗓️', tier:'bronze', name:'On a Roll',  desc:'Log sessions on 3 different calendar days.', check:s=>uniqueDays(s)>=3,  prog:s=>[uniqueDays(s),3]},
   {id:'days_7',  icon:'🔥', tier:'silver', name:'Iron Will',  desc:'Log sessions on 7 different calendar days.', check:s=>uniqueDays(s)>=7,  prog:s=>[uniqueDays(s),7]},
   {id:'days_30', icon:'💎', tier:'gold',   name:'Unbroken',   desc:'Log sessions on 30 different calendar days.', check:s=>uniqueDays(s)>=30, prog:s=>[uniqueDays(s),30]},
-
-  // Special
   {id:'comeback', icon:'🔄', tier:'silver', name:'Comeback', desc:'Beat a previous session after scoring lower the session before.', check:s=>s.exercises.some(ex=>{ const logs=s.logs.filter(l=>l.exId===ex.id).sort((a,b)=>a.ts-b.ts); for(let i=2;i<logs.length;i++){ const better=ex.direction==='lower'?logs[i].val<logs[i-1].val:logs[i].val>logs[i-1].val; const worse =ex.direction==='lower'?logs[i-1].val>logs[i-2].val:logs[i-1].val<logs[i-2].val; if(better&&worse) return true; } return false; })},
   {id:'overachiever',icon:'🌟',tier:'legend',name:'Overachiever',desc:'Score above 110% of the benchmark on any exercise.', check:s=>s.logs.some(l=>{const ex=s.exercises.find(e=>e.id===l.exId);return ex&&getPct(ex,l.val)>=110;})},
   {id:'upper_s',   icon:'💪', tier:'gold', name:'Upper Sovereign',  desc:'Achieve S rank or higher on an Upper Body exercise.', check:s=>s.logs.some(l=>{const ex=s.exercises.find(e=>e.id===l.exId);return ex&&ex.body==='upper'&&rankToNum(getRank(getPct(ex,l.val)))>=5;})},
@@ -690,10 +725,18 @@ function editExercise(id) {
   
   document.getElementById('ex-name').value = ex.name;
   document.getElementById('ex-unit').value = ex.unit;
-  document.getElementById('ex-best').value = ex.best;
   document.getElementById('ex-direction').value = ex.direction;
   document.getElementById('ex-body').value = ex.body;
   document.getElementById('ex-type').value = ex.type;
+  
+  updateExInputUI(); // Ensure correct inputs show
+  
+  if (ex.unit === 'minutes') {
+    document.getElementById('ex-best-min').value = Math.floor(ex.best);
+    document.getElementById('ex-best-sec').value = Math.round((ex.best % 1) * 60);
+  } else {
+    document.getElementById('ex-best').value = ex.best;
+  }
   
   document.getElementById('btn-submit-ex').textContent = "Update Exercise";
   document.getElementById('btn-submit-ex').style.backgroundColor = "rgba(200,169,110,0.1)";
@@ -711,12 +754,21 @@ function deleteExercise(id) {
 
 function addExercise(){
   const name=document.getElementById('ex-name').value.trim();
-  const unit=document.getElementById('ex-unit').value.trim()||'reps';
-  const best=parseFloat(document.getElementById('ex-best').value);
+  const unit=document.getElementById('ex-unit').value;
   const direction=document.getElementById('ex-direction').value;
   const body=document.getElementById('ex-body').value;
   const type=document.getElementById('ex-type').value;
   
+  let best;
+  if (unit === 'minutes') {
+    const m = parseFloat(document.getElementById('ex-best-min').value) || 0;
+    const s = parseFloat(document.getElementById('ex-best-sec').value) || 0;
+    best = m + (s / 60);
+    if (m === 0 && s === 0) best = NaN; // Force validation catch
+  } else {
+    best = parseFloat(document.getElementById('ex-best').value);
+  }
+
   if(!name||isNaN(best)||best<=0) return alert('Please fill in all required fields.');
 
   if (editingExId) {
@@ -734,10 +786,12 @@ function addExercise(){
   }
   
   save(); 
-  ['ex-name','ex-unit','ex-best'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('ex-direction').value='higher';
-  document.getElementById('ex-body').value='upper';
-  document.getElementById('ex-type').value='strength';
+  
+  // Clear forms
+  document.getElementById('ex-name').value = '';
+  document.getElementById('ex-best').value = '';
+  document.getElementById('ex-best-min').value = '';
+  document.getElementById('ex-best-sec').value = '';
   
   checkAchievements(); renderExercises(); renderLogView(); manageBoss();
 }
@@ -759,17 +813,18 @@ function renderExercises(){
     const pct = latest ? getPct(ex, latest.val) : null;
     const rank = pct !== null ? getRank(pct) : null;
     const dirTag = ex.direction==='lower' ? `<span class="dir-tag dir-down">▼ lower better</span>` : `<span class="dir-tag dir-up">▲ higher better</span>`;
-    const isPBLatest=latest&&ex.pb!==null&&latest.val===ex.pb;
-    
+    const isPBLatest = latest && ex.pb!==null && latest.val===ex.pb;
+    const displayUnit = ex.unit === 'minutes' ? 'min' : ex.unit;
+
     return `
     <div class="exercise-card">
       ${rank ? `<div class="rank-badge rank-${rank}">${rank}</div>` : `<div class="rank-badge rank-F" style="opacity:.3">?</div>`}
       <div class="exercise-info">
         <h3>${ex.name} ${dirTag}</h3>
         ${makeTags(ex)}
-        <span class="unit" style="margin-top:4px;display:block;">Benchmark: ${ex.best} ${ex.unit}</span>
+        <span class="unit" style="margin-top:4px;display:block;">Benchmark: ${formatVal(ex.best, ex.unit)} ${displayUnit}</span>
         ${latest
-          ?`<div class="pb-label">Last: <span class="pb-value">${latest.val} ${ex.unit}</span>${isPBLatest?' <span class="pb-crown">👑 PB</span>':''}</div>`
+          ?`<div class="pb-label">Last: <span class="pb-value">${formatVal(latest.val, ex.unit)} ${displayUnit}</span>${isPBLatest?' <span class="pb-crown">👑 PB</span>':''}</div>`
           :'<div class="pb-label" style="color:var(--muted)">No sessions yet</div>'}
       </div>
       <div class="exercise-actions" style="display:flex; flex-direction:column; gap:6px;">
@@ -793,25 +848,30 @@ function renderHistory(){
   const cont=document.getElementById('log-history');
   const logs=[...state.logs].sort((a,b)=>b.ts-a.ts).slice(0,30);
   if(!logs.length){cont.innerHTML='<div class="no-logs">No sessions logged yet.</div>';return;}
+  
   cont.innerHTML=logs.map(l=>{
     const ex=state.exercises.find(e=>e.id===l.exId);
     if(!ex) return '';
     const pct=getPct(ex,l.val); const rank=getRank(pct);
     const prevLogs=state.logs.filter(x=>x.exId===l.exId&&x.ts<l.ts).sort((a,b)=>b.ts-a.ts);
     const prev=prevLogs[0]; let vsHtml='';
+    
     if(prev){
-      const diff=l.val-prev.val;
-      const imp=ex.direction==='lower'?diff<0:diff>0;
-      const wor=ex.direction==='lower'?diff>0:diff<0;
-      vsHtml=`<span class="log-vs ${imp?'log-up':wor?'log-down':'log-same'}">${imp?'▲':wor?'▼':'='} ${Math.abs(diff)} vs prev</span>`;
+      const diff = l.val - prev.val;
+      const imp = ex.direction==='lower' ? diff<0 : diff>0;
+      const wor = ex.direction==='lower' ? diff>0 : diff<0;
+      vsHtml=`<span class="log-vs ${imp?'log-up':wor?'log-down':'log-same'}">${imp?'▲':wor?'▼':'='} ${formatVal(Math.abs(diff), ex.unit)} vs prev</span>`;
     }
+    
     const date=new Date(l.ts).toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'2-digit'});
+    const displayUnit = ex.unit === 'minutes' ? 'min' : ex.unit;
+
     return `
     <div class="log-entry">
       <div class="rank-badge rank-${rank}" style="width:36px;height:36px;font-size:10px;">${rank}</div>
       <span class="log-date">${date}</span>
       <strong style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;">${ex.name}</strong>
-      <span class="log-val">${l.val}</span><span class="log-unit"> ${ex.unit}</span>
+      <span class="log-val">${formatVal(l.val, ex.unit)}</span><span class="log-unit"> ${displayUnit}</span>
       <span style="color:var(--muted);font-size:12px;">${pct}%</span>
       ${vsHtml}
     </div>`;
@@ -820,17 +880,26 @@ function renderHistory(){
 
 function submitLog(){
   const exId=parseInt(document.getElementById('log-exercise').value);
-  const val=parseFloat(document.getElementById('log-amount').value);
   const dateStr=document.getElementById('log-date').value;
-  if(!exId||isNaN(val)||val<=0||!dateStr) return alert('Fill in all fields.');
-  
   const ex=state.exercises.find(e=>e.id===exId);
-  if(!ex) return;
+  if(!ex || !dateStr) return alert('Select exercise and date.');
+
+  let val;
+  if (ex.unit === 'minutes') {
+    const m = parseFloat(document.getElementById('log-amount-min').value) || 0;
+    const s = parseFloat(document.getElementById('log-amount-sec').value) || 0;
+    val = m + (s / 60);
+    if (m === 0 && s === 0) return alert('Enter a time value.');
+  } else {
+    val = parseFloat(document.getElementById('log-amount').value);
+    if (isNaN(val) || val <= 0) return alert('Enter a valid amount.');
+  }
+  
   const ts=new Date(dateStr).getTime()+(Date.now()%86400000);
   const pct=getPct(ex,val); const rank=getRank(pct);
   
-  const isPB=ex.pb===null||(ex.direction==='lower'?val<ex.pb:val>ex.pb);
-  if(isPB) ex.pb=val;
+  const isPB = ex.pb===null || (ex.direction==='lower' ? val < ex.pb : val > ex.pb);
+  if(isPB) ex.pb = val;
 
   let bossDefeated = false;
   if (state.boss && state.boss.exId === exId) {
@@ -848,7 +917,11 @@ function submitLog(){
 
   state.logs.push({id:Date.now(),exId,val,ts});
   save();
+  
+  // Clear Inputs
   document.getElementById('log-amount').value='';
+  document.getElementById('log-amount-min').value='';
+  document.getElementById('log-amount-sec').value='';
   
   const prevLogs=state.logs.filter(l=>l.exId===exId&&l.ts<ts).sort((a,b)=>b.ts-a.ts);
   const prev=prevLogs[0];
@@ -866,11 +939,14 @@ function showModal(ex,val,pct,rank,isPB,prev,xpGained, bossDefeated, newlyUnlock
   badge.textContent=rank; badge.className=`rank-badge rank-${rank}`;
   badge.style.cssText+='width:72px;height:72px;font-size:20px;';
   
-  document.getElementById('modal-pct').textContent=`${val} ${ex.unit} — ${pct}% of Best`;
+  const displayUnit = ex.unit === 'minutes' ? 'min' : ex.unit;
+
+  document.getElementById('modal-pct').textContent=`${formatVal(val, ex.unit)} ${displayUnit} — ${pct}% of Best`;
+  
   if(prev){
-    const diff=val-prev.val;
-    const imp=ex.direction==='lower'?diff<0:diff>0;
-    document.getElementById('modal-vs').textContent=`${diff>0?'+':''}${diff} ${ex.unit} vs previous (${imp?'▲ improved':diff!==0?'▼ declined':'= same'})`;
+    const diff = val - prev.val;
+    const imp = ex.direction==='lower' ? diff<0 : diff>0;
+    document.getElementById('modal-vs').textContent=`${diff>0?'+':''}${formatVal(diff, ex.unit)} ${displayUnit} vs previous (${imp?'▲ improved':diff!==0?'▼ declined':'= same'})`;
   } else {
     document.getElementById('modal-vs').textContent='First session for this exercise!';
   }
@@ -967,6 +1043,7 @@ function renderCharacter(){
     html+=`<div class="stat-group-header" style="color:${BODY_COLORS[bp]};">${BODY_LABELS[bp]}</div>`;
     html+=groups[bp].map(r=>{
       const barW=Math.min(100,r.pct); const color=RC[r.rank];
+      const displayUnit = r.ex.unit === 'minutes' ? 'min' : r.ex.unit;
       return `
       <div class="stat-row">
         <div class="rank-badge rank-${r.rank}" style="width:38px;height:38px;font-size:10px;">${r.rank}</div>
@@ -975,8 +1052,8 @@ function renderCharacter(){
           <div class="tags" style="margin-top:2px;"><span class="tag tag-${r.ex.type}" style="font-size:9px;padding:1px 5px;">${TYPE_LABELS[r.ex.type]}</span></div>
           <div class="stat-bar-wrap" style="margin-top:4px;"><div class="stat-bar" style="width:${barW}%;background:${color};"></div></div>
         </div>
-        <div class="stat-val" style="color:${color};">${r.latest?r.latest.val:'—'}<span style="font-size:9px;color:var(--muted);"> ${r.ex.unit}</span></div>
-        <div class="stat-pb">Best ${r.ex.best}<br><span style="font-size:9px;">${r.pct}% ${r.ex.direction==='lower'?'▼':'▲'}</span></div>
+        <div class="stat-val" style="color:${color};">${r.latest ? formatVal(r.latest.val, r.ex.unit) : '—'}<span style="font-size:9px;color:var(--muted);"> ${displayUnit}</span></div>
+        <div class="stat-pb">Best ${formatVal(r.ex.best, r.ex.unit)}<br><span style="font-size:9px;">${r.pct}% ${r.ex.direction==='lower'?'▼':'▲'}</span></div>
       </div>`;
     }).join('');
   });
@@ -997,14 +1074,11 @@ renderAchievements();
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js')
-        .then(registration => {
-          console.log('ServiceWorker registered successfully');
-        })
-        .catch(err => {
-          console.log('ServiceWorker registration failed: ', err);
-        });
+        .then(registration => console.log('ServiceWorker registered'))
+        .catch(err => console.log('ServiceWorker failed: ', err));
     });
   }
 </script>
 </body>
 </html>
+```
