@@ -20,15 +20,14 @@
     --bg:#070710; --bg2:#0d0d1a; --bg3:#12122a;
     --panel:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.07);
     --accent:#c8a96e; --accent2:#7b5ea7; --text:#e8e0d0; --muted:#6b6a7a;
-    /* RANK COLORS */
-    --rank-f:#555555; /* Stone Grey */
-    --rank-c:#2e6b3e; /* Forest Green */
-    --rank-b:#1a5f8a; /* Deep Blue */
-    --rank-a:#6a2ea0; /* Royal Purple */
-    --rank-s:#c8a92e; /* Gold */
-    --rank-ss:#e07830; /* Orange Blaze */
-    --rank-sss:#cc2040; /* Crimson Glow */
-    
+    --rank-f:#555555; 
+    --rank-d:#7a4f2a; 
+    --rank-c:#2e6b3e; 
+    --rank-b:#1a5f8a; 
+    --rank-a:#6a2ea0; 
+    --rank-s:#c8a92e; 
+    --rank-ss:#e07830; 
+    --rank-sss:#cc2040;
     --glow-s:0 0 20px rgba(200,169,46,0.6);
     --glow-sss:0 0 25px rgba(204,32,64,0.8);
   }
@@ -87,23 +86,14 @@
   .benchmark-text {font-size: 11px; color: var(--muted); margin-top: 4px;}
   .pb-text {font-size: 11px; color: var(--accent); font-weight: bold;}
 
-  /* LOG ENTRY */
   .log-entry{
     display:grid; grid-template-columns: auto 1fr auto auto; align-items:center; gap:14px; padding:10px 14px;
     background:rgba(255,255,255,0.02); border:1px solid var(--border); margin-bottom:8px; font-size:14px;
-    border-left: 3px solid transparent; /* Placeholder for rank borders */
+    border-left: 3px solid transparent;
   }
 
-  /* RANK STYLING */
-  .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:12px;border-radius:2px;border:2px solid;}
-  .rank-F{color:var(--rank-f); border-color:var(--rank-f); background:rgba(85,85,85,0.05);}
-  .rank-C{color:var(--rank-c); border-color:var(--rank-c); background:rgba(46,107,62,0.05);}
-  .rank-B{color:var(--rank-b); border-color:var(--rank-b); background:rgba(26,95,138,0.05);}
-  .rank-A{color:var(--rank-a); border-color:var(--rank-a); background:rgba(106,46,160,0.05);}
-  .rank-S{color:var(--rank-s); border-color:var(--rank-s); background:rgba(200,169,46,0.05); box-shadow:var(--glow-s);}
-  .rank-SS{color:var(--rank-ss); border-color:var(--rank-ss); background:rgba(224,120,48,0.05);}
-  .rank-SSS{color:var(--rank-sss); border-color:var(--rank-sss); background:rgba(204,32,64,0.05); box-shadow:var(--glow-sss); animation: pulse-sss 2s infinite;}
-  
+  .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:12px;border-radius:2px;border:2px solid;flex-shrink:0;}
+  .rank-SSS{box-shadow:var(--glow-sss); animation: pulse-sss 2s infinite;}
   @keyframes pulse-sss { 0%,100% {opacity:1;} 50% {opacity:0.7;} }
 
   .radar-wrap { width: 100%; max-width: 400px; margin: 0 auto; }
@@ -150,7 +140,9 @@
       <div class="form-grid">
         <input type="text" id="ex-name" placeholder="Exercise Name">
         <select id="ex-unit" onchange="updateExInputUI()">
-            <option value="reps">Reps</option><option value="kg">kg</option><option value="minutes">Time (M:S)</option>
+            <option value="reps">Reps</option>
+            <option value="kg">kg</option>
+            <option value="minutes">Time (M:S)</option>
         </select>
         <div id="ex-best-standard-wrap"><input type="number" id="ex-best" placeholder="SSS Benchmark"></div>
         <div id="ex-best-time-wrap" style="display:none; gap:8px; display:flex;">
@@ -262,52 +254,27 @@ function playSound(t){
     o.start(); o.stop(n+0.5);
 }
 
-// --- AT HOME ARSENAL DATA ---
-const SEED_EXERCISES = [
-    {name: "Pull-Ups (Vest: 20kg)", unit: "reps", best: 15, body: "upper", type: "strength", direction: "higher"},
-    {name: "Diamond Push-Ups (Vest: 20kg)", unit: "reps", best: 35, body: "upper", type: "strength", direction: "higher"},
-    {name: "Chin-Ups (Max Reps)", unit: "reps", best: 30, body: "upper", type: "endurance", direction: "higher"},
-    {name: "Floor Press (Barbell: 36kg)", unit: "reps", best: 50, body: "upper", type: "strength", direction: "higher"},
-    {name: "Overhead Press (Barbell: 36kg)", unit: "reps", best: 25, body: "upper", type: "strength", direction: "higher"},
-    {name: "Dumbbell Row (18kg)", unit: "reps", best: 40, body: "upper", type: "strength", direction: "higher"},
-    {name: "Archer Push-Ups", unit: "reps", best: 20, body: "upper", type: "strength", direction: "higher"},
-    {name: "Pseudo-Planche Push-Ups", unit: "reps", best: 15, body: "upper", type: "strength", direction: "higher"},
-    {name: "Handstand Push-Ups (Wall)", unit: "reps", best: 12, body: "upper", type: "strength", direction: "higher"},
-    {name: "Bicep Curls (Barbell: 36kg)", unit: "reps", best: 20, body: "upper", type: "strength", direction: "higher"},
-    {name: "Pistol Squats", unit: "reps", best: 20, body: "lower", type: "strength", direction: "higher"},
-    {name: "Walking Lunges (Vest+DBs)", unit: "reps", best: 40, body: "lower", type: "strength", direction: "higher"},
-    {name: "Bulgarian Split Squat (Vest)", unit: "reps", best: 30, body: "lower", type: "strength", direction: "higher"},
-    {name: "Barbell Squat (Explosive 36kg)", unit: "reps", best: 50, body: "lower", type: "speed", direction: "higher"},
-    {name: "Broad Jump (Distance)", unit: "minutes", best: 3.05, body: "lower", type: "speed", direction: "higher"},
-    {name: "Box Jumps (Max Height)", unit: "reps", best: 40, body: "lower", type: "speed", direction: "higher"},
-    {name: "Hanging Leg Raises", unit: "reps", best: 25, body: "core", type: "strength", direction: "higher"},
-    {name: "L-Sit Hold", unit: "minutes", best: 1, body: "core", type: "strength", direction: "higher"},
-    {name: "Weighted Plank (Vest: 20kg)", unit: "minutes", best: 5, body: "core", type: "endurance", direction: "higher"},
-    {name: "Dragon Flag Negatives", unit: "reps", best: 10, body: "core", type: "strength", direction: "higher"},
-    {name: "5km Run", unit: "minutes", best: 19, body: "cardio", type: "endurance", direction: "lower"},
-    {name: "100m Sprint", unit: "minutes", best: 0.19, body: "cardio", type: "speed", direction: "lower"},
-    {name: "Burpees (5 Min Max)", unit: "reps", best: 100, body: "cardio", type: "speed", direction: "higher"},
-    {name: "Band Swing Speed", unit: "reps", best: 130, body: "core", type: "speed", direction: "higher"},
-    {name: "Rotational Band Slams", unit: "reps", best: 60, body: "core", type: "speed", direction: "higher"},
-    {name: "Plyometric Push-Ups", unit: "reps", best: 30, body: "upper", type: "speed", direction: "higher"}
-];
-
+// --- STATE ---
 let state = JSON.parse(localStorage.getItem('sovereign_at_home_v2') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"path":"none","boss":null,"protocols":[]}');
-
-if (state.exercises.length === 0) {
-    SEED_EXERCISES.forEach((ex, i) => state.exercises.push({...ex, id: Date.now() + i, pb: null}));
-    save();
-}
-
 function save(){ localStorage.setItem('sovereign_at_home_v2', JSON.stringify(state)); }
 
 // --- HELPERS ---
 function formatVal(v,u){ if(u!=='minutes' || isNaN(v) || v === null) return v; let s=Math.round(v*60); return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`; }
 function getPct(ex,v){ return ex.direction==='lower' ? Math.round((ex.best/v)*100) : Math.round((v/ex.best)*100); }
-function getRank(p){ if(p>=100)return'SSS';if(p>=85)return'SS';if(p>=70)return'S';if(p>=55)return'A';if(p>=40)return'B';if(p>=25)return'C';return'F';}
-function rankToNum(r){return{F:0,C:1,B:2,A:3,S:4,SS:5,SSS:6}[r]??0;}
-function numToRank(n){return['F','C','B','A','S','SS','SSS'][Math.min(6,Math.round(n))];}
-const RC={F:'#555',C:'#2e6b3e',B:'#1a5f8a',A:'#6a2ea0',S:'#c8a92e',SS:'#e07830',SSS:'#cc2040'};
+
+function getRank(p){ 
+    if(p>=100)return'SSS';
+    if(p>=85)return'SS';
+    if(p>=70)return'S';
+    if(p>=55)return'A';
+    if(p>=40)return'B';
+    if(p>=25)return'C';
+    if(p>=10)return'D';
+    return 'F';
+}
+function rankToNum(r){return{F:0,D:1,C:2,B:3,A:4,S:5,SS:6,SSS:7}[r]??0;}
+function numToRank(n){return['F','D','C','B','A','S','SS','SSS'][Math.min(7,Math.round(n))];}
+const RC={F:'#555',D:'#7a4f2a',C:'#2e6b3e',B:'#1a5f8a',A:'#6a2ea0',S:'#c8a92e',SS:'#e07830',SSS:'#cc2040'};
 
 // --- XP ---
 function addXP(base, ex){
@@ -404,9 +371,13 @@ function renderExercises(){
 function editEx(id){
     editId=id; let ex=state.exercises.find(e=>e.id===id);
     document.getElementById('ex-name').value=ex.name; document.getElementById('ex-unit').value=ex.unit; updateExInputUI();
+    if(ex.unit==='minutes'){
+        document.getElementById('ex-best-min').value=Math.floor(ex.best);
+        document.getElementById('ex-best-sec').value=Math.round((ex.best%1)*60);
+    } else document.getElementById('ex-best').value=ex.best;
     document.getElementById('btn-submit-ex').textContent="Update Protocol"; window.scrollTo(0,0);
 }
-function delEx(id){ if(confirm("Purge exercise and logs?")){state.exercises=state.exercises.filter(e=>e.id!==id); state.logs=state.logs.filter(l=>l.exId!==id); save(); renderExercises();} }
+function delEx(id){ if(confirm("Purge exercise?")){state.exercises=state.exercises.filter(e=>e.id!==id); state.logs=state.logs.filter(l=>l.exId!==id); save(); renderExercises();} }
 
 // --- LOGGING ---
 let aProto=null, pIdx=0;
@@ -472,7 +443,7 @@ const FEATS=[
     {id:'f1', icon:'⚔️', name:'First Step', desc:'Log 1 session.', check:s=>s.logs.length>=1},
     {id:'f2', icon:'🔥', name:'Dedicated', desc:'Log 10 sessions.', check:s=>s.logs.length>=10},
     {id:'f3', icon:'👑', name:'Sovereign', desc:'Achieve S Rank.', check:s=>s.logs.some(l=>{let e=s.exercises.find(x=>x.id==l.exId); return e&&getPct(e,l.val)>=70})},
-    {id:'f4', icon:'👹', name:'Slayer', desc:'Defeat a Boss.', check:s=>s.unlockedAchs['boss_slayer']}
+    {id:'boss_slayer', icon:'👹', name:'Slayer', desc:'Defeat a Boss.', check:s=>s.unlockedAchs['boss_slayer']}
 ];
 function checkAchs(){ FEATS.forEach(f=>{if(!state.unlockedAchs[f.id]&&f.check(state)){state.unlockedAchs[f.id]=Date.now(); showToast({icon:f.icon,name:f.name});}}); save();}
 function resetAch(id){ if(confirm("Reset feat?")){delete state.unlockedAchs[id]; save(); renderAchievements();}}
@@ -514,6 +485,7 @@ function renderCharacter(){
     document.getElementById('stat-golf').textContent=numToRank(allR);
     document.getElementById('stat-javelin').textContent=numToRank(upperR.length?upperR.map(r=>rankToNum(r.rank)).reduce((a,b)=>a+b,0)/upperR.length:0);
 }
+function updatePath(){ state.path=document.getElementById('char-path').value; save(); }
 function closeModal(){ document.getElementById('result-modal').classList.remove('open'); clearInterval(tI); }
 function showToast(a){ let e=document.createElement('div'); e.className='toast show'; e.innerHTML=`<span>${a.icon}</span><div>${a.name}</div>`; document.getElementById('toast-wrap').appendChild(e); setTimeout(()=>e.remove(),3000);}
 function exportData(){ let b=new Blob([JSON.stringify(state)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='sovereign.json'; a.click();}
