@@ -55,13 +55,9 @@
   .boss-panel {border-color: rgba(204,32,64,0.4); background: radial-gradient(circle at top right, rgba(204,32,64,0.05), transparent);}
   .boss-title {color: var(--rank-sss); text-shadow: var(--glow-sss);}
   .boss-target {font-size: 24px; font-weight: 700; color: #fff;}
-  .boss-sub {font-size: 12px; color: var(--muted); letter-spacing: 1px;}
-
+  
   .shadow-wrap {margin-top: 10px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px dashed var(--muted); border-radius: 2px; display: none;}
   .shadow-wrap.active {display: flex; justify-content: space-between; align-items: center;}
-  .shadow-title {font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase;}
-  .shadow-value {font-weight: 700; color: #aaa; font-size: 16px;}
-
   .timer-wrap {margin-top: 16px; text-align: center; display: none;}
   .timer-display {font-family:'Cinzel Decorative',serif; font-size: 32px; font-weight: 900; color: var(--accent); margin: 10px 0;}
   
@@ -77,16 +73,9 @@
   /* EXERCISE CARDS */
   .exercise-list{display:flex;flex-direction:column;gap:12px;}
   .exercise-card{
-    background:rgba(255,255,255,0.02);
-    border:1px solid var(--border);
-    border-radius:2px;
-    padding:14px 18px;
-    display:grid;
-    grid-template-columns: 1fr 15%; 
-    gap:16px;
-    align-items:center;
+    background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:2px; padding:14px 18px;
+    display:grid; grid-template-columns: 1fr 15%; gap:16px; align-items:center;
   }
-  .exercise-info { min-width: 0; }
   .exercise-info h3{
     font-family:'Cinzel',serif; font-size:13px; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px;
     white-space: normal; word-break: break-word; line-height: 1.3;
@@ -94,35 +83,33 @@
   .exercise-actions{ display:flex; flex-direction:column; gap:6px; align-items: flex-end; }
   .btn-small { padding: 6px 0; font-size: 9px; width: 100%; text-align: center; }
 
-  /* LOG HISTORY */
+  /* LOG ENTRY */
   .log-entry{
-    display:grid; 
-    grid-template-columns: auto 1fr auto auto; 
-    align-items:center; 
-    gap:14px; 
-    padding:10px 14px; 
-    background:rgba(255,255,255,0.02); 
-    border:1px solid var(--border); 
-    border-radius:2px; 
-    margin-bottom:8px; 
-    font-size:14px;
+    display:grid; grid-template-columns: auto 1fr auto auto; align-items:center; gap:14px; padding:10px 14px;
+    background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:2px; margin-bottom:8px; font-size:14px;
   }
   .log-date{color:var(--muted); font-size:11px; width:45px;}
   .log-name{font-family:'Cinzel',serif; font-size:11px; letter-spacing:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .log-val-wrap{text-align:right;}
-  .log-val{font-weight:700; color:var(--text);}
-  .log-unit{color:var(--muted); font-size:10px; margin-left:2px;}
 
   /* RANKS */
   .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:14px;border-radius:2px;border:2px solid;flex-shrink:0;}
-  .rank-F  {color:var(--rank-f);  border-color:var(--rank-f);  background:rgba(85,85,85,0.1);}
-  .rank-S  {color:var(--rank-s);  border-color:var(--rank-s);  background:rgba(200,169,46,0.1);box-shadow:var(--glow-s);}
+  .rank-F  {color:var(--rank-f); border-color:var(--rank-f); background:rgba(85,85,85,0.1);}
+  .rank-S  {color:var(--rank-s); border-color:var(--rank-s); background:rgba(200,169,46,0.1);box-shadow:var(--glow-s);}
   .rank-SSS{color:var(--rank-sss);border-color:var(--rank-sss);background:rgba(204,32,64,0.1);box-shadow:var(--glow-sss);animation:pulse-sss 2s ease-in-out infinite;}
 
-  .char-overall-rank .big-rank{font-family:'Cinzel Decorative',serif;font-size:42px;font-weight:900;}
   .body-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px;}
   .body-card .bc-rank{font-family:'Cinzel Decorative',serif;font-size:22px;font-weight:900;}
+
+  /* ACHIEVEMENTS */
   .achievements-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+  .achievement{
+    background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:2px; 
+    padding:18px; display:flex; gap:16px; align-items:flex-start; position:relative; cursor: pointer;
+  }
+  .achievement.unlocked{border-color:rgba(200,169,110,0.3);background:rgba(200,169,110,0.04);}
+  .achievement.locked{opacity:.4;filter:grayscale(0.7);}
+  .ach-icon{font-size:30px;line-height:1;}
+
   .toast-wrap{position:fixed;bottom:30px;right:30px;z-index:200;display:flex;flex-direction:column;gap:10px;pointer-events:none;}
   .toast{background:#0d0d1a;border:1px solid rgba(200,169,110,0.5);border-radius:2px;padding:14px 18px;display:flex;gap:14px;align-items:center;min-width:280px;transform:translateX(120%);transition:transform .4s;}
   .toast.show{transform:translateX(0);}
@@ -158,7 +145,6 @@
       <div class="panel-title boss-title">⚠️ Active Boss Target</div>
       <div id="boss-details"></div>
     </div>
-
     <div class="panel">
       <div class="panel-title">Manage Exercise</div>
       <div class="form-grid">
@@ -205,7 +191,6 @@
       </div>
       <button class="btn btn-full" id="btn-submit-ex" onclick="addExercise()">Add Exercise</button>
     </div>
-
     <div class="panel">
       <div class="panel-title">Your Arsenal <span class="section-count" id="ex-count"></span></div>
       <div id="exercise-list" class="exercise-list"></div>
@@ -246,7 +231,6 @@
         <option value="paladin">Paladin (Balanced Focus)</option>
       </select>
     </div>
-    
     <div class="panel">
         <div class="panel-title">Athletic Lineage</div>
         <div style="display:flex; gap:10px; margin-bottom:20px;">
@@ -255,7 +239,6 @@
         </div>
         <div class="body-summary" id="body-summary"></div>
     </div>
-
     <div class="panel">
       <div class="panel-title">Sheet</div>
       <div class="char-sheet">
@@ -295,7 +278,6 @@
     <button class="btn btn-full" onclick="closeModal()" style="margin-top:20px;">Continue</button>
   </div>
 </div>
-
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
@@ -306,8 +288,8 @@ function save(){ localStorage.setItem('sovereign_v2', JSON.stringify(state)); }
 // --- HELPERS ---
 function formatVal(val, unit) {
     if (unit !== 'minutes' || isNaN(val)) return val;
-    let sTotal = Math.round(val * 60);
-    return `${Math.floor(Math.abs(sTotal)/60)}:${(Math.abs(sTotal)%60).toString().padStart(2,'0')}`;
+    let sT = Math.round(val * 60);
+    return `${Math.floor(Math.abs(sT)/60)}:${(Math.abs(sT)%60).toString().padStart(2,'0')}`;
 }
 function getPct(ex, val){ return ex.direction==='lower' ? Math.round((ex.best/val)*100) : Math.round((val/ex.best)*100); }
 function getRank(pct){
@@ -388,8 +370,7 @@ function addExercise() {
         state.exercises[idx] = {...state.exercises[idx], name:document.getElementById('ex-name').value, unit, best, direction:document.getElementById('ex-direction').value, body:document.getElementById('ex-body').value, type:document.getElementById('ex-type').value};
         editingId = null; document.getElementById('btn-submit-ex').textContent = "Add Exercise";
     } else state.exercises.push({id:Date.now(), name:document.getElementById('ex-name').value, unit, best, direction:document.getElementById('ex-direction').value, body:document.getElementById('ex-body').value, type:document.getElementById('ex-type').value, pb:null});
-    save(); renderExercises(); 
-    document.getElementById('ex-name').value = '';
+    save(); location.reload();
 }
 function renderExercises() {
     document.getElementById('exercise-list').innerHTML = state.exercises.map(ex => `
@@ -403,9 +384,7 @@ function renderExercises() {
 }
 function delEx(id){ 
   if(!confirm("Delete exercise and all its history?")) return;
-  state.exercises=state.exercises.filter(e=>e.id!==id); 
-  state.logs=state.logs.filter(l=>l.exId!==id);
-  save(); renderExercises(); 
+  state.exercises=state.exercises.filter(e=>e.id!==id); state.logs=state.logs.filter(l=>l.exId!==id); save(); renderExercises(); 
 }
 function editEx(id){
     editingId = id; let ex = state.exercises.find(e=>e.id===id);
@@ -433,45 +412,26 @@ function submitLog() {
     showModal(ex, val, xp, isPB, bossDef);
     renderHistory();
 }
-
 function renderHistory(){
   const cont = document.getElementById('log-history');
-  const sortedLogs = [...state.logs].sort((a,b) => b.ts - a.ts);
-  if(!sortedLogs.length) { cont.innerHTML = '<div style="text-align:center; padding:20px; color:var(--muted);">No logs yet.</div>'; return; }
-  
-  cont.innerHTML = sortedLogs.map(l => {
+  const sorted = [...state.logs].sort((a,b) => b.ts - a.ts);
+  if(!sorted.length) { cont.innerHTML = '<div style="text-align:center; padding:20px; color:var(--muted);">No logs yet.</div>'; return; }
+  cont.innerHTML = sorted.map(l => {
     const ex = state.exercises.find(e => e.id == l.exId);
     if(!ex) return '';
-    const date = new Date(l.ts).toLocaleDateString('en-ZA', {month:'short', day:'numeric'});
-    return `
-    <div class="log-entry">
-      <div class="log-date">${date}</div>
-      <div class="log-name">${ex.name}</div>
-      <div class="log-val-wrap">
-        <span class="log-val">${formatVal(l.val, ex.unit)}</span>
-        <span class="log-unit">${ex.unit}</span>
-      </div>
-      <button class="btn btn-danger btn-small" style="padding:4px 8px; font-size:8px; min-width:auto;" onclick="deleteLog(${l.id})">✖</button>
-    </div>`;
+    return `<div class="log-entry"><div class="log-date">${new Date(l.ts).toLocaleDateString('en-ZA', {month:'short', day:'numeric'})}</div><div class="log-name">${ex.name}</div><div class="log-val-wrap"><span class="log-val">${formatVal(l.val, ex.unit)}</span><span class="log-unit">${ex.unit}</span></div><button class="btn btn-danger btn-small" style="padding:4px 8px; font-size:8px; min-width:auto;" onclick="deleteLog(${l.id})">✖</button></div>`;
   }).join('');
 }
-
 function deleteLog(id){
-  if(!confirm("Delete this log entry?")) return;
+  if(!confirm("Delete log entry?")) return;
   state.logs = state.logs.filter(l => l.id !== id);
-  // Recalculate PBs for all exercises to ensure they are still accurate
   state.exercises.forEach(ex => {
-    const exLogs = state.logs.filter(l => l.exId === ex.id);
-    if(!exLogs.length) { ex.pb = null; }
-    else {
-      ex.pb = ex.direction === 'lower' ? Math.min(...exLogs.map(l => l.val)) : Math.max(...exLogs.map(l => l.val));
-    }
+    const exL = state.logs.filter(l => l.exId === ex.id);
+    if(!exL.length) ex.pb = null;
+    else ex.pb = ex.direction==='lower' ? Math.min(...exL.map(l=>l.val)) : Math.max(...exL.map(l=>l.val));
   });
-  save();
-  renderHistory();
-  renderCharacter();
+  save(); renderHistory(); renderCharacter();
 }
-
 function showModal(ex, val, xp, isPB, bossDef) {
     let pct = getPct(ex, val), rank = getRank(pct);
     document.getElementById('modal-exercise-name').textContent = ex.name;
@@ -497,9 +457,13 @@ function checkAchievements(){
     FEATS.forEach(f => { if(!state.unlockedAchs[f.id] && f.check(state)){ state.unlockedAchs[f.id]=Date.now(); showToast({icon:f.icon, name:f.name}); }});
     save();
 }
+function resetAchievement(id) {
+    if(!confirm("Reset this achievement?")) return;
+    delete state.unlockedAchs[id]; save(); renderAchievements();
+}
 function renderAchievements(){
     document.getElementById('achievements-grid').innerHTML = FEATS.map(f => `
-    <div class="achievement ${state.unlockedAchs[f.id]?'unlocked':'locked'}">
+    <div class="achievement ${state.unlockedAchs[f.id]?'unlocked':'locked'}" onclick="${state.unlockedAchs[f.id] ? `resetAchievement('${f.id}')` : ''}">
         <div class="ach-icon">${f.icon}</div>
         <div><div class="ach-name">${f.name}</div><div class="ach-desc">${f.desc}</div></div>
     </div>`).join('');
@@ -507,13 +471,10 @@ function renderAchievements(){
 
 // --- CHARACTER ---
 function renderCharacter(){
-    let exRows = state.exercises.map(ex => { let pct = ex.pb?getPct(ex,ex.pb):0; return {ex, pct, rank:getRank(pct)}});
-    document.getElementById('char-stats').innerHTML = exRows.map(r => `<div class="stat-row"><div class="rank-badge rank-${r.rank}" style="width:30px;height:30px;font-size:10px">${r.rank}</div><div class="stat-name">${r.ex.name}</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(r.pct,100)}%;background:${RC[r.rank]}"></div></div><div class="stat-val">${formatVal(r.ex.pb, r.ex.unit)}</div></div>`).join('');
-    
-    // Lineage
-    let upperR = exRows.filter(r => r.ex.body === 'upper');
-    let golfR = numToRank(exRows.length ? exRows.map(r=>rankToNum(r.rank)).reduce((a,b)=>a+b,0)/exRows.length : 0);
-    document.getElementById('stat-golf').textContent = golfR;
+    let exR = state.exercises.map(ex => { let p = ex.pb?getPct(ex,ex.pb):0; return {ex, p, rank:getRank(p)}});
+    document.getElementById('char-stats').innerHTML = exR.map(r => `<div class="stat-row"><div class="rank-badge rank-${r.rank}" style="width:30px;height:30px;font-size:10px">${r.rank}</div><div class="stat-name">${r.ex.name}</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(r.p,100)}%;background:${RC[r.rank]}"></div></div><div class="stat-val">${formatVal(r.ex.pb, r.ex.unit)}</div></div>`).join('');
+    let upperR = exR.filter(r => r.ex.body === 'upper');
+    document.getElementById('stat-golf').textContent = numToRank(exR.length ? exR.map(r=>rankToNum(r.rank)).reduce((a,b)=>a+b,0)/exR.length : 0);
     document.getElementById('stat-javelin').textContent = numToRank(upperR.length?upperR.map(r=>rankToNum(r.rank)).reduce((a,b)=>a+b,0)/upperR.length:0);
 }
 
@@ -525,9 +486,7 @@ function renderLogView(){ document.getElementById('log-exercise').innerHTML = '<
 function showToast(a){ let e=document.createElement('div'); e.className='toast show'; e.innerHTML=`<span>${a.icon}</span><div>${a.name}</div>`; document.getElementById('toast-wrap').appendChild(e); setTimeout(()=>e.remove(),3000);}
 function exportData(){ let b=new Blob([JSON.stringify(state)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='sovereign.json'; a.click();}
 function importData(e) {
-  const reader = new FileReader();
-  reader.onload = (ev) => { state = JSON.parse(ev.target.result); save(); location.reload(); };
-  reader.readAsText(e.target.files[0]);
+  const r = new FileReader(); r.onload = (ev) => { state = JSON.parse(ev.target.result); save(); location.reload(); }; r.readAsText(e.target.files[0]);
 }
 
 // INIT
