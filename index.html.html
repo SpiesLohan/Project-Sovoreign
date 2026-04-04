@@ -36,7 +36,6 @@
   .logo-subtitle{font-family:'Cinzel',serif;font-size:11px;letter-spacing:8px;color:var(--accent);text-transform:uppercase;margin-bottom:12px;opacity:.8;}
   h1{font-family:'Cinzel Decorative',serif;font-size:clamp(28px,5vw,52px);font-weight:900;background:linear-gradient(135deg,#e8d9b0 0%,#c8a96e 40%,#8b6d3a 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px;line-height:1.1;}
   
-  /* XP BAR */
   .xp-container {max-width: 400px; margin: 20px auto 0; text-align: center;}
   .level-text {font-family:'Cinzel',serif; font-size:12px; letter-spacing:2px; color:var(--accent); margin-bottom:6px; text-transform:uppercase;}
   .xp-bar-bg {height:4px; background:rgba(255,255,255,0.05); border-radius:2px; overflow:hidden;}
@@ -44,30 +43,26 @@
   .xp-text {font-size:10px; color:var(--muted); margin-top:6px; letter-spacing:1px;}
   .header-divider{width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:24px auto 0;}
 
-  /* TABS */
   .tabs{display:flex;gap:4px;margin-bottom:32px;background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:4px;flex-wrap:nowrap;overflow-x:auto;}
   .tab{flex:1;padding:10px 4px;background:none;border:1px solid transparent;color:var(--muted);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;border-radius:1px;position:relative;white-space:nowrap;}
   .tab.active{background:rgba(200,169,110,0.1);color:var(--accent);border:1px solid rgba(200,169,110,0.2);}
   .tab:hover:not(.active){color:var(--text);}
-  .tab .notif{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--rank-sss);border-radius:50%;box-shadow:0 0 6px rgba(204,32,64,0.8);display:none;}
-  .tab .notif.show{display:block;}
   .view{display:none;} .view.active{display:block;}
 
   .panel{background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:24px;margin-bottom:20px;}
   .panel-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:12px;}
   .panel-title::after{content:'';flex:1;height:1px;background:var(--border);}
 
-  /* BOSS PANEL */
   .boss-panel {border-color: rgba(204,32,64,0.4); background: radial-gradient(circle at top right, rgba(204,32,64,0.05), transparent);}
   .boss-title {color: var(--rank-sss); text-shadow: var(--glow-sss);}
   .boss-target {font-size: 24px; font-weight: 700; color: #fff;}
   .boss-sub {font-size: 12px; color: var(--muted); letter-spacing: 1px;}
 
-  /* SHADOW & TIMER */
   .shadow-wrap {margin-top: 10px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px dashed var(--muted); border-radius: 2px; display: none;}
   .shadow-wrap.active {display: flex; justify-content: space-between; align-items: center;}
   .shadow-title {font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase;}
   .shadow-value {font-weight: 700; color: #aaa; font-size: 16px;}
+
   .timer-wrap {margin-top: 16px; text-align: center; display: none;}
   .timer-display {font-family:'Cinzel Decorative',serif; font-size: 32px; font-weight: 900; color: var(--accent); margin: 10px 0;}
   
@@ -75,9 +70,7 @@
   .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:16px;}
   label{display:block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-family:'Cinzel',serif;}
   input,select{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:2px;color:var(--text);padding:10px 14px;font-family:'Rajdhani',sans-serif;font-size:15px;outline:none;transition:border-color .2s;}
-  input:focus,select:focus{border-color:rgba(200,169,110,0.4);}
 
-  /* TIME INPUT SPECIFICS */
   .time-input-group {display:flex; align-items:center; gap:8px;}
   .time-input-group input {text-align: center;}
   .time-separator {font-size: 18px; color: var(--muted); font-weight: bold;}
@@ -99,71 +92,21 @@
   .rank-SS {color:var(--rank-ss); border-color:var(--rank-ss); background:rgba(224,120,48,0.1);box-shadow:var(--glow-ss);}
   .rank-SSS{color:var(--rank-sss);border-color:var(--rank-sss);background:rgba(204,32,64,0.1);box-shadow:var(--glow-sss);animation:pulse-sss 2s ease-in-out infinite;}
 
-  /* TAGS & EXERCISE CARDS */
-  .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
-  .tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:2px;border:1px solid;font-family:'Cinzel',serif;}
-  .tag-upper    {color:var(--upper);    border-color:var(--upper);    background:rgba(90,159,200,0.08);}
-  .tag-lower    {color:var(--lower);    border-color:var(--lower);    background:rgba(106,184,122,0.08);}
-  .tag-core     {color:var(--core);     border-color:var(--core);     background:rgba(200,169,110,0.08);}
-  .tag-fullbody {color:var(--fullbody); border-color:var(--fullbody); background:rgba(160,126,200,0.08);}
-  .tag-cardio   {color:var(--cardio);   border-color:var(--cardio);   background:rgba(224,120,120,0.08);}
-  .tag-strength   {color:var(--strength);   border-color:var(--strength);   background:rgba(232,160,80,0.08);}
-  .tag-endurance  {color:var(--endurance);  border-color:var(--endurance);  background:rgba(80,184,232,0.08);}
-  .tag-flexibility{color:var(--flexibility);border-color:var(--flexibility);background:rgba(152,200,120,0.08);}
-  .tag-speed      {color:var(--speed);      border-color:var(--speed);      background:rgba(232,112,168,0.08);}
-
   .exercise-list{display:flex;flex-direction:column;gap:12px;}
   .exercise-card{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:2px;padding:18px 20px;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;transition:border-color .2s;}
   .exercise-info h3{font-family:'Cinzel',serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;}
   .exercise-info .unit{font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
-  .exercise-info .pb-label{font-size:12px;color:var(--muted);margin-top:4px;}
-  .exercise-info .pb-value{color:var(--accent);font-weight:700;font-size:14px;}
-  .pb-crown{font-size:10px;margin-left:4px;}
-  .exercise-actions{display:flex;gap:8px;align-items:center;}
-  .dir-tag{font-size:10px;letter-spacing:1px;margin-left:8px;}
-  .dir-up{color:#4a9f6a;} .dir-down{color:#5a9fc8;}
 
-  /* LOG */
+  /* ACTION BUTTONS FIX */
+  .exercise-actions{display:flex;flex-direction:column;gap:6px;justify-content:center;}
+  .btn-small {padding: 6px 12px; font-size: 9px; letter-spacing: 1px; min-width: 60px;}
+
   .log-entry{display:flex;align-items:center;gap:14px;padding:10px 14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:2px;margin-bottom:8px;font-size:14px;flex-wrap:wrap;}
-  .log-date{color:var(--muted);font-size:12px;min-width:80px;}
-  .log-val{font-weight:700;font-size:18px;margin-right:2px;}
-  .log-unit{color:var(--muted);font-size:12px;text-transform:uppercase;}
-  .log-vs{margin-left:auto;font-size:12px;}
-  .log-up{color:#4caf50;} .log-down{color:#f44336;} .log-same{color:var(--muted);}
-
-  /* CHARACTER SHEET */
-  .char-sheet{display:grid;grid-template-columns:250px 1fr;gap:24px;align-items:start;}
-  @media(max-width:700px){.char-sheet{grid-template-columns:1fr;}}
-  .char-portrait{width:100%;aspect-ratio:3/4;background:var(--bg3);border:1px solid var(--border);border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;}
-  .char-silhouette{width:110px;opacity:.6;}
-  .char-overall-rank{position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(transparent,rgba(7,7,16,0.95));text-align:center;}
-  .char-overall-rank .rank-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
   .char-overall-rank .big-rank{font-family:'Cinzel Decorative',serif;font-size:42px;font-weight:900;}
-  .char-stats{display:flex;flex-direction:column;gap:8px;}
-  .stat-group-header{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:14px;padding-bottom:4px;border-bottom:1px solid var(--border);}
-  .stat-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:12px 14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:2px;}
-  .stat-name{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;min-width:85px;}
-  .stat-bar-wrap{height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;}
-  .stat-bar{height:100%;border-radius:3px;transition:width .8s;}
-  .stat-val{font-weight:700;font-size:14px;text-align:right;}
-
   .body-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px;}
-  .body-card{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:2px;padding:14px;text-align:center;}
-  .body-card .bc-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
   .body-card .bc-rank{font-family:'Cinzel Decorative',serif;font-size:22px;font-weight:900;}
-
-  /* ACHIEVEMENTS */
   .achievements-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
-  .achievement{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:2px;padding:18px;display:flex;gap:16px;align-items:flex-start;position:relative;overflow:hidden;}
-  .achievement.unlocked{border-color:rgba(200,169,110,0.3);background:rgba(200,169,110,0.04);}
-  .achievement.locked{opacity:.4;filter:grayscale(0.7);}
-  .ach-icon{font-size:30px;line-height:1;}
-  .ach-name{font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
-  .ach-desc{font-size:12px;color:var(--muted);line-height:1.4;}
-  .ach-progress{height:3px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:8px;overflow:hidden;}
-  .ach-progress-bar{height:100%;background:rgba(200,169,110,0.4);}
-
-  /* TOAST & MODAL */
+  .achievement{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:2px;padding:18px;display:flex;gap:16px;align-items:flex-start;position:relative;}
   .toast-wrap{position:fixed;bottom:30px;right:30px;z-index:200;display:flex;flex-direction:column;gap:10px;pointer-events:none;}
   .toast{background:#0d0d1a;border:1px solid rgba(200,169,110,0.5);border-radius:2px;padding:14px 18px;display:flex;gap:14px;align-items:center;min-width:280px;transform:translateX(120%);transition:transform .4s;}
   .toast.show{transform:translateX(0);}
@@ -434,8 +377,8 @@ function renderExercises() {
         <span class="unit">Best: ${formatVal(ex.best, ex.unit)} ${ex.unit}</span>
       </div>
       <div class="exercise-actions">
-        <button class="btn" onclick="editEx(${ex.id})">Edit</button>
-        <button class="btn btn-danger" onclick="delEx(${ex.id})">Del</button>
+        <button class="btn btn-small" onclick="editEx(${ex.id})">Edit</button>
+        <button class="btn btn-danger btn-small" onclick="delEx(${ex.id})">Del</button>
       </div>
     </div>`).join('');
 }
@@ -447,6 +390,7 @@ function editEx(id){
     document.getElementById('ex-unit').value = ex.unit;
     updateExInputUI();
     document.getElementById('btn-submit-ex').textContent = "Update";
+    window.scrollTo({top:0, behavior:'smooth'});
 }
 
 // --- LOGGING ---
@@ -535,4 +479,3 @@ renderHeader(); renderExercises(); renderCharacter();
 </script>
 </body>
 </html>
-```
