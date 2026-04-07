@@ -20,7 +20,7 @@
     --bg:#070710; --bg2:#0d0d1a; --bg3:#12122a;
     --panel:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.07);
     --accent:#c8a96e; --accent2:#7b5ea7; --text:#e8e0d0; --muted:#6b6a7a;
-    --rank-f:#555555; --rank-d:#7a4f2a; --rank-c:#2e6b3e; --rank-b:#1a5f8a; --rank-a:#6a2ea0; --rank-s:#c8a92e; --rank-ss:#e07830; --rank-sss:#cc2040;
+    --rank-f:#555; --rank-d:#7a4f2a; --rank-c:#2e6b3e; --rank-b:#1a5f8a; --rank-a:#6a2ea0; --rank-s:#c8a92e; --rank-ss:#e07830; --rank-sss:#cc2040;
     --glow-s:0 0 20px rgba(200,169,46,0.6); --glow-sss:0 0 25px rgba(204,32,64,0.8);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -44,37 +44,38 @@
   .panel-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:12px;}
   .panel-title::after{content:'';flex:1;height:1px;background:var(--border);}
 
-  /* LOGGING UI */
+  /* EXERCISE CARDS (15/85 Split) */
+  .exercise-list{display:flex;flex-direction:column;gap:12px;}
+  .exercise-card{
+    background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:2px; padding:14px 18px;
+    display:grid; grid-template-columns: 1fr 15%; gap:16px; align-items:center;
+  }
+  .exercise-info h3{ font-family:'Cinzel',serif; font-size:13px; text-transform:uppercase; white-space: normal; word-break: break-word; }
+  .exercise-actions{ display:flex; flex-direction:column; gap:6px; align-items: flex-end; }
+  .history-link { font-size: 9px; color: var(--accent); text-decoration: underline; cursor: pointer; margin-top: 4px; display: inline-block;}
+
+  /* LOG HISTORY & SETS */
   .set-row {display: grid; grid-template-columns: 1fr 1fr 40px; gap: 10px; margin-bottom: 10px; align-items: center;}
-  .one-rm-display {background: rgba(200,169,110,0.1); padding: 15px; border-radius: 2px; text-align: center; margin: 15px 0; border: 1px dashed var(--accent);}
-  
-  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:16px;}
-  input,select{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:2px;color:var(--text);padding:10px 14px;font-family:'Rajdhani',sans-serif;font-size:15px;outline:none;}
+  .log-entry{
+    display:grid; grid-template-columns: auto 1fr auto auto; align-items:center; gap:14px; padding:10px 14px;
+    background:rgba(255,255,255,0.02); border:1px solid var(--border); margin-bottom:8px; font-size:14px;
+    border-left: 4px solid transparent;
+  }
+  .log-name{font-family:'Cinzel',serif; font-size:11px; letter-spacing:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+  .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:12px;border-radius:2px;border:2px solid;flex-shrink:0;}
+  .rank-SSS{box-shadow:var(--glow-sss); animation: pulse-sss 2s infinite;}
+  @keyframes pulse-sss { 0%,100% {opacity:1;} 50% {opacity:0.7;} }
 
   .btn{padding:11px 28px;background:none;border:1px solid var(--accent);color:var(--accent);font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;}
   .btn-danger{border-color:#cc3344;color:#cc3344;}
   .btn-full{width:100%;margin-top:16px;}
   .btn-small { padding: 6px 0; font-size: 9px; width: 100%; text-align: center; }
 
-  .exercise-card{
-    background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:2px; padding:14px 18px;
-    display:grid; grid-template-columns: 1fr 20%; gap:16px; align-items:center; margin-bottom: 12px;
-  }
-  .log-entry{
-    display:grid; grid-template-columns: auto 1fr auto auto; align-items:center; gap:14px; padding:10px 14px;
-    background:rgba(255,255,255,0.02); border:1px solid var(--border); margin-bottom:8px; font-size:14px;
-    border-left: 4px solid transparent;
-  }
-
-  .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:12px;border-radius:2px;border:2px solid;flex-shrink:0;}
-  
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .2s;}
   .modal-overlay.open{opacity:1;pointer-events:all;}
   .modal{background:#0d0d1a;border:1px solid var(--accent);padding:32px;width:100%;max-width:440px;margin:20px;max-height:90vh;overflow-y:auto;}
-
-  .history-link { font-size: 9px; color: var(--accent); text-decoration: underline; cursor: pointer; margin-top: 4px; display: inline-block;}
-  .benchmark-text {font-size: 11px; color: var(--muted); margin-top: 4px;}
-  .pb-text {font-size: 11px; color: var(--accent); font-weight: bold;}
+  .chart-container { height: 250px; width: 100%; }
 </style>
 </head>
 <body>
@@ -91,42 +92,59 @@
 
   <div class="tabs">
     <button class="tab active" onclick="switchTab('exercises',this)">Arsenal</button>
+    <button class="tab" onclick="switchTab('protocols',this)">Protocols</button>
     <button class="tab" onclick="switchTab('log',this)">Log</button>
     <button class="tab" onclick="switchTab('character',this)">Character</button>
     <button class="tab" onclick="switchTab('achievements',this)">Feats</button>
   </div>
 
   <div class="view active" id="view-exercises">
+    <div class="panel boss-panel" id="boss-container" style="display: none;">
+      <div class="panel-title boss-title">⚠️ Active Boss Target</div>
+      <div id="boss-details"></div>
+    </div>
     <div class="panel">
-      <div class="panel-title">Add Exercise</div>
+      <div class="panel-title" id="manage-ex-title">Add Exercise</div>
       <div class="form-grid">
-        <input type="text" id="ex-name" placeholder="Name">
+        <input type="text" id="ex-name" placeholder="Exercise Name">
         <select id="ex-unit" onchange="updateExInputUI()">
             <option value="kg">Weighted (kg)</option>
             <option value="reps">Bodyweight (Reps)</option>
             <option value="minutes">Time (M:S)</option>
         </select>
-        <div id="ex-best-standard-wrap"><input type="number" id="ex-best" placeholder="SSS 1RM/Benchmark"></div>
+        <div id="ex-best-standard-wrap"><input type="number" id="ex-best" placeholder="SSS Benchmark"></div>
         <div id="ex-best-time-wrap" style="display:none; gap:8px; display:flex;">
           <input type="number" id="ex-best-min" placeholder="Min" style="flex:1;"><input type="number" id="ex-best-sec" placeholder="Sec" style="flex:1;">
         </div>
+        <select id="ex-direction"><option value="higher">Higher Better</option><option value="lower">Lower Better</option></select>
         <select id="ex-body"><option value="upper">Upper</option><option value="lower">Lower</option><option value="core">Core</option><option value="cardio">Cardio</option></select>
         <select id="ex-type"><option value="strength">Strength</option><option value="speed">Speed</option></select>
       </div>
-      <button class="btn btn-full" onclick="addExercise()">Add Exercise</button>
+      <button class="btn btn-full" id="btn-submit-ex" onclick="addExercise()">Add to Arsenal</button>
     </div>
-    <div id="exercise-list"></div>
+    <div id="exercise-list" class="exercise-list"></div>
+  </div>
+
+  <div class="view" id="view-protocols">
+    <div class="panel">
+      <div class="panel-title">Create Protocol</div>
+      <input type="text" id="proto-name" placeholder="e.g. Leg Day">
+      <div id="proto-selector" style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:5px; max-height: 200px; overflow-y: auto; padding: 10px; border: 1px solid var(--border);"></div>
+      <button class="btn btn-full" onclick="createProtocol()">Initialize Protocol</button>
+    </div>
+    <div id="protocol-list"></div>
   </div>
 
   <div class="view" id="view-log">
     <div class="panel">
       <div class="panel-title">Capture Session</div>
+      <div id="proto-notice" style="display:none; color:var(--accent2); font-size:10px; margin-bottom:5px;">// PROTOCOL ACTIVE //</div>
       <select id="log-exercise" onchange="setupLogUI()"></select>
       
       <div id="strength-log-ui" style="display:none; margin-top:20px;">
         <div id="set-container"></div>
         <button class="btn" style="padding: 5px 15px; font-size: 10px;" onclick="addSetRow()">+ Add Set</button>
-        <div class="one-rm-display">
+        <div style="background: rgba(200,169,110,0.1); padding: 15px; border-radius: 2px; text-align: center; margin-top:15px; border: 1px dashed var(--accent);">
           <div style="font-size:10px; color:var(--muted); letter-spacing:2px;">ESTIMATED 1RM</div>
           <div id="est-1rm-val" style="font-size:24px; font-weight:900; color:var(--accent);">0.00 kg</div>
         </div>
@@ -134,15 +152,19 @@
 
       <div id="standard-log-ui" style="margin-top:20px;">
         <div class="form-grid">
-           <div id="log-amount-standard-wrap"><input type="number" id="log-amount" placeholder="Performance Result"></div>
+           <div id="log-amount-standard-wrap"><input type="number" id="log-amount" placeholder="Result"></div>
            <div id="log-amount-time-wrap" style="display:none; gap:8px; display:flex;">
              <input type="number" id="log-amount-min" placeholder="Min"><input type="number" id="log-amount-sec" placeholder="Sec">
            </div>
         </div>
       </div>
 
+      <div class="shadow-wrap" id="shadow-display">
+        <div style="font-size:10px; color:var(--muted)">SHADOW (PB)</div>
+        <div id="shadow-val" style="font-weight:700; color:var(--accent)">—</div>
+      </div>
       <input type="date" id="log-date" style="margin-top:15px;">
-      <button class="btn btn-full" onclick="submitLog()">Finalize Capture</button>
+      <button class="btn btn-full" onclick="submitLog()">Record Log</button>
     </div>
     <div id="log-history"></div>
   </div>
@@ -151,6 +173,10 @@
     <div class="panel">
         <div class="panel-title">Athletic Pentagram</div>
         <div style="width: 100%; max-width: 400px; margin: 0 auto;"><canvas id="radarChart"></canvas></div>
+    </div>
+    <div id="lineage-stats" style="display:flex; gap:10px; margin-bottom:20px;">
+        <div class="panel" style="flex:1; text-align:center;">Golf: <span id="stat-golf" style="color:var(--accent)">—</span></div>
+        <div class="panel" style="flex:1; text-align:center;">Javelin: <span id="stat-javelin" style="color:var(--accent)">—</span></div>
     </div>
     <div id="char-stats"></div>
     <button class="btn btn-full" onclick="exportData()">Backup System</button>
@@ -166,14 +192,27 @@
     <div class="modal-title">Ascension Logged</div>
     <div style="display:flex; align-items:center; gap:15px; margin:20px 0;">
         <div class="rank-badge" id="modal-rank"></div>
-        <div>
-          <div id="modal-pct" style="font-weight:700; font-size:18px;"></div>
-          <div id="modal-val-detail" style="font-size:12px; color:var(--muted);"></div>
-        </div>
+        <div id="modal-pct" style="font-weight:700; font-size:18px;"></div>
     </div>
-    <button class="btn btn-full" onclick="closeModal()">Continue</button>
+    <div id="modal-pb-msg" style="text-align:center; color:var(--accent)"></div>
+    <div id="modal-xp" style="text-align:center; color:var(--accent2); margin:10px 0;"></div>
+    <div style="text-align:center; border-top:1px solid var(--border); padding-top:20px;">
+        <div style="font-size:32px; font-weight:900; color:var(--accent);" id="timer-clock">01:30</div>
+        <button class="btn btn-small" onclick="startTimer()">Start Rest</button>
+    </div>
+    <button class="btn btn-full" onclick="closeResult()">Continue</button>
   </div>
 </div>
+
+<div class="modal-overlay" id="chart-modal">
+    <div class="modal">
+        <div class="panel-title" id="chart-title">History</div>
+        <div class="chart-container"><canvas id="historyChart"></canvas></div>
+        <button class="btn btn-full" onclick="document.getElementById('chart-modal').classList.remove('open')">Close</button>
+    </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
 // --- AUDIO ---
@@ -182,178 +221,180 @@ function playSound(t){
     const o=aCtx.createOscillator(), g=aCtx.createGain(); o.connect(g); g.connect(aCtx.destination);
     const n=aCtx.currentTime;
     if(t==='click'){o.type='sine';o.frequency.setValueAtTime(800,n);g.gain.setValueAtTime(0.1,n);g.gain.linearRampToValueAtTime(0,n+0.1);}
+    else if(t==='success'){o.type='triangle';o.frequency.setValueAtTime(400,n);o.frequency.exponentialRampToValueAtTime(1200,n+0.3);g.gain.setValueAtTime(0.1,n);g.gain.linearRampToValueAtTime(0,n+0.4);}
     else if(t==='powerUp'){o.type='sawtooth';o.frequency.setValueAtTime(100,n);o.frequency.linearRampToValueAtTime(800,n+0.5);g.gain.setValueAtTime(0.05,n);g.gain.linearRampToValueAtTime(0,n+0.5);}
     o.start(); o.stop(n+0.5);
 }
 
-// --- AT HOME ARSENAL BENCHMARKS (SSS TARGETS) ---
-const SEED_EXERCISES = [
-    {name: "Pull-Ups (Vest: 20kg)", unit: "reps", best: 15, body: "upper", type: "strength"},
-    {name: "Diamond Push-Ups (Vest: 20kg)", unit: "reps", best: 35, body: "upper", type: "strength"},
-    {name: "Floor Press (Barbell 1RM)", unit: "kg", best: 120, body: "upper", type: "strength"},
-    {name: "Overhead Press (Barbell 1RM)", unit: "kg", best: 80, body: "upper", type: "strength"},
-    {name: "Dumbbell Row (1RM/Equivalent)", unit: "kg", best: 50, body: "upper", type: "strength"},
-    {name: "Handstand Push-Ups (Wall)", unit: "reps", best: 12, body: "upper", type: "strength"},
-    {name: "Pistol Squats (Strict)", unit: "reps", best: 20, body: "lower", type: "strength"},
-    {name: "Bulgarian Split Squat (Vest)", unit: "reps", best: 30, body: "lower", type: "strength"},
-    {name: "Barbell Squat (Explosive 36kg)", unit: "reps", best: 50, body: "lower", type: "speed"},
-    {name: "Broad Jump (Distance)", unit: "minutes", best: 3.05, body: "lower", type: "speed"},
-    {name: "Weighted Plank (Vest: 20kg)", unit: "minutes", best: 5.00, body: "core", type: "strength"},
-    {name: "Band Swing Speed Potential", unit: "reps", best: 130, body: "core", type: "speed"},
-    {name: "5km Run (High Altitude)", unit: "minutes", best: 19.00, body: "cardio", type: "strength"}
-];
-
-let state = JSON.parse(localStorage.getItem('sovereign_at_home_v3') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"path":"none"}');
-
-if (state.exercises.length === 0) {
-    SEED_EXERCISES.forEach((ex, i) => state.exercises.push({...ex, id: Date.now() + i, pb: null}));
-}
-
-function save(){ localStorage.setItem('sovereign_at_home_v3', JSON.stringify(state)); }
+// --- STATE ---
+let state = JSON.parse(localStorage.getItem('sovereign_ultimate_final') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"path":"none","boss":null,"protocols":[]}');
+function save(){ localStorage.setItem('sovereign_ultimate_final', JSON.stringify(state)); }
 
 const RC={F:'#555',D:'#7a4f2a',C:'#2e6b3e',B:'#1a5f8a',A:'#6a2ea0',S:'#c8a92e',SS:'#e07830',SSS:'#cc2040'};
 
 // --- HELPERS ---
-function formatVal(v,u){ if(u!=='minutes' || isNaN(v) || v===null) return v; let s=Math.round(v*60); return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`; }
-function calc1RM(w, r) { if (r <= 1) return w; return w * (36 / (37 - r)); }
-
+function formatVal(v,u){ if(u!=='minutes' || isNaN(v) || v === null) return v; let s=Math.round(v*60); return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`; }
+function calc1RM(w, r) { return r <= 1 ? w : w * (36 / (37 - r)); }
+function getPct(ex,v){ return ex.direction==='lower' ? Math.round((ex.best/v)*100) : Math.round((v/ex.best)*100); }
 function getRank(p){ 
-    if(p>=100) return 'SSS'; if(p>=85) return 'SS'; if(p>=70) return 'S';
-    if(p>=55) return 'A'; if(p>=40) return 'B'; if(p>=25) return 'C';
-    if(p>=10) return 'D'; return 'F';
+    if(p>=100)return'SSS'; if(p>=85)return'SS'; if(p>=70)return'S'; if(p>=55)return'A'; if(p>=40)return'B'; if(p>=25)return'C'; if(p>=10)return'D'; return 'F';
 }
+function rankToNum(r){return{F:0,D:1,C:2,B:3,A:4,S:5,SS:6,SSS:7}[r]??0;}
+function numToRank(n){return['F','D','C','B','A','S','SS','SSS'][Math.min(7,Math.round(n))];}
 
-// --- UI LOGIC ---
+// --- ARSENAL ---
+let editId=null;
 function updateExInputUI(){
-    const unit = document.getElementById('ex-unit').value;
-    document.getElementById('ex-best-standard-wrap').style.display = (unit === 'minutes') ? 'none' : 'block';
-    document.getElementById('ex-best-time-wrap').style.display = (unit === 'minutes') ? 'flex' : 'none';
+    let isT=document.getElementById('ex-unit').value==='minutes';
+    document.getElementById('ex-best-standard-wrap').style.display=isT?'none':'block';
+    document.getElementById('ex-best-time-wrap').style.display=isT?'flex':'none';
 }
+function addExercise(){
+    const u=document.getElementById('ex-unit').value; let b;
+    if(u==='minutes') b=(parseFloat(document.getElementById('ex-best-min').value)||0)+(parseFloat(document.getElementById('ex-best-sec').value)||0)/60;
+    else b=parseFloat(document.getElementById('ex-best').value);
+    if(!document.getElementById('ex-name').value||isNaN(b)) return;
+    if(editId){
+        let i=state.exercises.findIndex(e=>e.id===editId);
+        state.exercises[i]={...state.exercises[i], name:document.getElementById('ex-name').value, unit:u, best:b, direction:document.getElementById('ex-direction').value, body:document.getElementById('ex-body').value, type:document.getElementById('ex-type').value};
+        editId=null; document.getElementById('btn-submit-ex').textContent="Add to Arsenal"; document.getElementById('manage-ex-title').textContent="Add Exercise";
+    } else state.exercises.push({id:Date.now(), name:document.getElementById('ex-name').value, unit:u, best:b, body:document.getElementById('ex-body').value, type:document.getElementById('ex-type').value, direction:document.getElementById('ex-direction').value, pb:null});
+    save(); location.reload();
+}
+function renderExercises(){
+    document.getElementById('exercise-list').innerHTML = state.exercises.map(ex => `
+    <div class="exercise-card">
+        <div class="exercise-info"><h3>${ex.name}</h3><div style="font-size:10px; color:var(--muted)">SSS: ${formatVal(ex.best, ex.unit)} | PB: ${formatVal(ex.pb||0, ex.unit)}</div><span class="history-link" onclick="showHistory(${ex.id})">Chronology</span></div>
+        <div class="exercise-actions">
+            <button class="btn btn-small" onclick="editEx(${ex.id})">Edit</button>
+            <button class="btn btn-danger btn-small" onclick="delEx(${ex.id})">Del</button>
+        </div>
+    </div>`).join('');
+}
+function editEx(id){
+    editId=id; let ex=state.exercises.find(e=>e.id===id);
+    document.getElementById('ex-name').value=ex.name; document.getElementById('ex-unit').value=ex.unit; updateExInputUI();
+    if(ex.unit==='minutes'){
+        document.getElementById('ex-best-min').value=Math.floor(ex.best);
+        document.getElementById('ex-best-sec').value=Math.round((ex.best%1)*60);
+    } else document.getElementById('ex-best').value=ex.best;
+    document.getElementById('ex-direction').value=ex.direction;
+    document.getElementById('ex-body').value=ex.body;
+    document.getElementById('ex-type').value=ex.type;
+    document.getElementById('btn-submit-ex').textContent="Update Protocol";
+    document.getElementById('manage-ex-title').textContent="Edit Exercise";
+    window.scrollTo(0,0);
+}
+function delEx(id){ if(confirm("Purge exercise and logs?")){state.exercises=state.exercises.filter(e=>e.id!==id); state.logs=state.logs.filter(l=>l.exId!==id); save(); renderExercises();} }
 
+// --- LOGGING ---
 function setupLogUI() {
     const ex = state.exercises.find(e => e.id == document.getElementById('log-exercise').value);
-    const strengthUI = document.getElementById('strength-log-ui');
-    const standardUI = document.getElementById('standard-log-ui');
-    
-    // Auto-detect if we should use 1RM logic (Only if it's kg AND not a "Vest" exercise)
-    const isHeavyWeighted = ex && ex.unit === 'kg' && !ex.name.toLowerCase().includes('vest');
-
-    if (isHeavyWeighted) {
-        strengthUI.style.display = 'block';
-        standardUI.style.display = 'none';
-        if (document.getElementById('set-container').children.length === 0) addSetRow();
-    } else {
-        strengthUI.style.display = 'none';
-        standardUI.style.display = 'block';
-        const isTime = ex && ex.unit === 'minutes';
-        document.getElementById('log-amount-time-wrap').style.display = isTime ? 'flex' : 'none';
-        document.getElementById('log-amount-standard-wrap').style.display = isTime ? 'none' : 'block';
-    }
-    
+    const is1RM = ex && ex.unit === 'kg' && !ex.name.toLowerCase().includes('vest');
+    document.getElementById('strength-log-ui').style.display = is1RM ? 'block' : 'none';
+    document.getElementById('standard-log-ui').style.display = is1RM ? 'none' : 'block';
+    if(is1RM && !document.getElementById('set-container').children.length) addSetRow();
+    document.getElementById('log-amount-time-wrap').style.display = (ex && ex.unit === 'minutes') ? 'flex' : 'none';
+    document.getElementById('log-amount-standard-wrap').style.display = (ex && ex.unit === 'minutes') ? 'none' : 'block';
     let w = document.getElementById('shadow-display');
     if(ex && ex.pb){ w.classList.add('active'); document.getElementById('shadow-val').textContent = formatVal(ex.pb, ex.unit); }
     else w.classList.remove('active');
 }
-
-function addSetRow() {
-    const container = document.getElementById('set-container');
-    const row = document.createElement('div'); row.className = 'set-row';
-    row.innerHTML = `<input type="number" class="set-w" placeholder="kg" oninput="updateLive1RM()"><input type="number" class="set-r" placeholder="reps" oninput="updateLive1RM()"><button class="btn btn-danger btn-small" onclick="this.parentElement.remove(); updateLive1RM();">✖</button>`;
-    container.appendChild(row);
+function addSetRow(){
+    const c = document.getElementById('set-container'), r = document.createElement('div'); r.className='set-row';
+    r.innerHTML = `<input type="number" class="set-w" placeholder="kg" oninput="updateLive1RM()"><input type="number" class="set-r" placeholder="reps" oninput="updateLive1RM()"><button class="btn btn-danger btn-small" onclick="this.parentElement.remove(); updateLive1RM();">✖</button>`;
+    c.appendChild(r);
+}
+function updateLive1RM(){
+    let max=0; document.querySelectorAll('.set-row').forEach(r=>{const w=parseFloat(r.querySelector('.set-w').value)||0, reps=parseFloat(r.querySelector('.set-r').value)||0; max=Math.max(max, calc1RM(w,reps));});
+    document.getElementById('est-1rm-val').textContent = max.toFixed(2)+" kg"; return max;
 }
 
-function updateLive1RM() {
-    let max = 0;
-    document.querySelectorAll('.set-row').forEach(row => {
-        const w = parseFloat(row.querySelector('.set-w').value) || 0;
-        const r = parseFloat(row.querySelector('.set-r').value) || 0;
-        max = Math.max(max, calc1RM(w, r));
-    });
-    document.getElementById('est-1rm-val').textContent = max.toFixed(2) + " kg";
-    return max;
-}
-
-// --- CORE ---
-function addExercise(){
-    const u = document.getElementById('ex-unit').value;
-    let b;
-    if(u==='minutes') b = (parseFloat(document.getElementById('ex-best-min').value)||0)+(parseFloat(document.getElementById('ex-best-sec').value)||0)/60;
-    else b = parseFloat(document.getElementById('ex-best').value);
-    state.exercises.push({id:Date.now(), name:document.getElementById('ex-name').value, unit:u, best:b, body:document.getElementById('ex-body').value, type:document.getElementById('ex-type').value, pb:null});
-    save(); renderExercises();
-}
-
-function renderExercises(){
-    document.getElementById('exercise-list').innerHTML = state.exercises.map(ex => `
-    <div class="exercise-card">
-        <div class="exercise-info">
-            <h3>${ex.name}</h3>
-            <div class="benchmark-text">SSS Benchmark: <strong>${formatVal(ex.best, ex.unit)}</strong></div>
-            ${ex.pb ? `<div class="pb-text">Personal Best: ${formatVal(ex.pb, ex.unit)}</div>` : ''}
-        </div>
-        <div class="exercise-actions"><button class="btn btn-danger btn-small" onclick="delEx(${ex.id})">Del</button></div>
-    </div>`).join('');
-}
-function delEx(id){ state.exercises=state.exercises.filter(e=>e.id!==id); save(); renderExercises(); }
-
-function submitLog() {
+function submitLog(){
     const ex = state.exercises.find(e => e.id == document.getElementById('log-exercise').value);
-    let val;
-    const isHeavyWeighted = ex && ex.unit === 'kg' && !ex.name.toLowerCase().includes('vest');
-
-    if (isHeavyWeighted) val = updateLive1RM();
+    let val; const is1RM = ex && ex.unit === 'kg' && !ex.name.toLowerCase().includes('vest');
+    if (is1RM) val = updateLive1RM();
     else if (ex.unit === 'minutes') val = (parseFloat(document.getElementById('log-amount-min').value)||0)+(parseFloat(document.getElementById('log-amount-sec').value)||0)/60;
     else val = parseFloat(document.getElementById('log-amount').value);
-
     if(!ex || isNaN(val)) return;
-    const isPB = ex.pb === null || val > ex.pb;
-    if(isPB) { ex.pb = val; playSound('powerUp'); } else playSound('success');
-    
+    const isPB = ex.pb === null || (ex.direction==='lower'?val<ex.pb:val>ex.pb);
+    if(isPB){ex.pb=val; playSound('powerUp');} else playSound('success');
+    let bDef=false; if(state.boss && state.boss.exId == ex.id && (ex.direction==='higher'?val>=state.boss.target:val<=state.boss.target)){bDef=true; state.boss=null;}
     state.logs.push({id:Date.now(), exId:ex.id, val, ts:new Date(document.getElementById('log-date').value).getTime()||Date.now()});
-    state.xp += 50; save(); renderHistory(); showModal(ex, val, isPB);
+    state.xp += 50; save(); showModal(ex,val,isPB,bDef);
 }
 
-function showModal(ex, v, isPB) {
-    const p = Math.round((v / ex.best) * 100); const r = getRank(p);
-    document.getElementById('modal-rank').textContent = r;
-    document.getElementById('modal-rank').className = `rank-badge rank-${r}`;
-    document.getElementById('modal-pct').textContent = `${p}% Ascension`;
-    document.getElementById('modal-val-detail').textContent = `Best: ${formatVal(v, ex.unit)}`;
+function showModal(ex,v,isPB,bDef){
+    let p=getPct(ex,v), r=getRank(p);
+    document.getElementById('modal-rank').textContent=r; document.getElementById('modal-rank').className=`rank-badge rank-${r}`;
+    document.getElementById('modal-pct').textContent=`${p}% Ascension`;
+    document.getElementById('modal-pb-msg').textContent=isPB?'👑 NEW PERSONAL BEST':'';
+    if(bDef) document.getElementById('modal-pb-msg').textContent+=' | 👹 BOSS DEFEATED';
     document.getElementById('result-modal').classList.add('open');
 }
 
-function renderHistory(){
-    const sorted = [...state.logs].sort((a,b)=>b.ts-a.ts).slice(0,15);
-    document.getElementById('log-history').innerHTML = sorted.map(l => {
-        const ex = state.exercises.find(e => e.id == l.exId); if(!ex) return '';
-        const r = getRank(Math.round((l.val/ex.best)*100));
-        return `<div class="log-entry" style="border-left-color:${RC[r]}">
-            <div style="font-size:10px; color:var(--muted)">${new Date(l.ts).toLocaleDateString()}</div>
-            <div style="font-family:'Cinzel'; font-size:11px;">${ex.name}</div>
-            <div style="text-align:right"><strong>${formatVal(l.val, ex.unit)}</strong></div>
-            <button class="btn btn-danger btn-small" style="width:30px" onclick="deleteLog(${l.id})">✖</button>
-        </div>`;
-    }).join('');
+// --- CHARTS & RADAR ---
+let rC, hC;
+function renderRadar(){
+    const s={Upper:0, Lower:0, Core:0, Cardio:0, Speed:0};
+    state.exercises.forEach(ex=>{ let p=ex.pb?getPct(ex,ex.pb):0; if(ex.body==='upper')s.Upper=Math.max(s.Upper,p); if(ex.body==='lower')s.Lower=Math.max(s.Lower,p); if(ex.body==='core')s.Core=Math.max(s.Core,p); if(ex.body==='cardio')s.Cardio=Math.max(s.Cardio,p); if(ex.type==='speed')s.Speed=Math.max(s.Speed,p);});
+    if(rC) rC.destroy();
+    rC = new Chart(document.getElementById('radarChart'),{type:'radar',data:{labels:Object.keys(s),datasets:[{data:Object.values(s),backgroundColor:'rgba(200,169,110,0.2)',borderColor:'#c8a96e'}]},options:{scales:{r:{min:0,max:100,ticks:{display:false},grid:{color:'rgba(255,255,255,0.1)'}}},plugins:{legend:{display:false}}}});
 }
-function deleteLog(id){ state.logs=state.logs.filter(l=>l.id!==id); save(); renderHistory(); }
+function showHistory(id){
+    const ex=state.exercises.find(e=>e.id===id), logs=state.logs.filter(l=>l.exId===id).sort((a,b)=>a.ts-b.ts);
+    document.getElementById('chart-title').textContent=ex.name; document.getElementById('chart-modal').classList.add('open');
+    if(hC) hC.destroy();
+    hC = new Chart(document.getElementById('historyChart'),{type:'line',data:{labels:logs.map(l=>new Date(l.ts).toLocaleDateString()),datasets:[{data:logs.map(l=>l.val),borderColor:'#c8a96e',tension:0.3}]},options:{maintainAspectRatio:false}});
+}
 
+// --- PROTOCOLS ---
+let aProto=null, pIdx=0;
+function createProtocol(){
+    let n=document.getElementById('proto-name').value, c=document.querySelectorAll('.proto-check:checked'), ids=Array.from(c).map(x=>parseInt(x.value));
+    state.protocols.push({id:Date.now(), name:n, exercises:ids}); save(); renderProtocols();
+}
+function renderProtocols(){
+    document.getElementById('protocol-list').innerHTML=state.protocols.map(p=>`<div class="protocol-card" onclick="startProto(${p.id})"><div>${p.name}</div></div>`).join('');
+    document.getElementById('proto-selector').innerHTML=state.exercises.map(e=>`<div><input type="checkbox" class="proto-check" value="${e.id}"> ${e.name}</div>`).join('');
+}
+function startProto(id){ aProto=state.protocols.find(p=>p.id===id); pIdx=0; switchTab('log',document.querySelectorAll('.tab')[2]); loadProtoEx();}
+function loadProtoEx(){ document.getElementById('log-exercise').value=aProto.exercises[pIdx]; document.getElementById('proto-notice').style.display='block'; setupLogUI();}
+
+// --- FEATS ---
+const FEATS = [{id:'f1', icon:'⚔️', name:'First Blood', desc:'Log 1 session.', check:s=>s.logs.length>=1}];
+function renderAchievements(){
+    document.getElementById('achievements-grid').innerHTML=FEATS.map(f=>`<div class="achievement ${state.unlockedAchs[f.id]?'unlocked':'locked'}"><div class="ach-icon">${f.icon}</div><div><div class="ach-name">${f.name}</div><div class="ach-desc">${f.desc}</div></div></div>`).join('');
+}
+
+// --- SYSTEM ---
+let tTimer;
+function startTimer(){ let l=90; clearInterval(tTimer); tTimer=setInterval(()=>{l--; document.getElementById('timer-clock').textContent=`0${Math.floor(l/60)}:${(l%60).toString().padStart(2,'0')}`; if(l<=0){clearInterval(tTimer);playSound('click');}},1000);}
 function switchTab(n,e){
-    playSound('click');
-    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    document.getElementById('view-'+n).classList.add('active'); e.classList.add('active');
-    if(n==='log') renderLogView();
+    playSound('click'); document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('view-'+n).classList.add('active'); e.classList.add('active');
+    if(n==='character'){renderCharacter(); renderRadar();} if(n==='achievements')renderAchievements(); if(n==='protocols')renderProtocols(); if(n==='log')renderLogView();
 }
-function renderLogView(){
-    document.getElementById('log-exercise').innerHTML='<option value="">-Select-</option>'+state.exercises.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
-    renderHistory();
+function renderLogView(){ document.getElementById('log-exercise').innerHTML='<option value="">-Select-</option>'+state.exercises.map(e=>`<option value="${e.id}">${e.name}</option>`).join(''); renderHistory();}
+function renderHistory(){
+    document.getElementById('log-history').innerHTML=state.logs.slice(-15).reverse().map(l=>{const ex=state.exercises.find(e=>e.id==l.exId); return ex?`<div class="log-entry" style="border-left-color:${RC[getRank(getPct(ex,l.val))]}"><div>${new Date(l.ts).toLocaleDateString()}</div><div class="log-name">${ex.name}</div><div style="text-align:right"><strong>${formatVal(l.val,ex.unit)}</strong></div><button class="btn btn-danger btn-small" style="width:30px" onclick="deleteLog(${l.id})">✖</button></div>`:'';}).join('');
 }
-function closeModal(){ document.getElementById('result-modal').classList.remove('open'); }
+function deleteLog(id){ if(confirm("Delete memory?")){state.logs=state.logs.filter(l=>l.id!==id); save(); renderHistory();} }
+function renderCharacter(){
+    let exR=state.exercises.map(ex=>{let p=ex.pb?getPct(ex,ex.pb):0; return{ex,p,rank:getRank(p)}});
+    document.getElementById('char-stats').innerHTML=exR.map(r=>`<div class="log-entry" style="border-left-color:${RC[r.rank]}"><div class="rank-badge rank-${r.rank}" style="width:30px;height:30px;font-size:10px">${r.rank}</div><div>${r.ex.name}</div><div style="text-align:right">${formatVal(r.ex.pb,r.ex.unit)}</div></div>`).join('');
+    let upperR=exR.filter(r=>r.ex.body==='upper'), allR=exR.length?exR.map(r=>rankToNum(r.rank)).reduce((a,b)=>a+b,0)/exR.length:0;
+    document.getElementById('stat-golf').textContent=numToRank(allR); document.getElementById('stat-javelin').textContent=numToRank(upperR.length?upperR.map(r=>rankToNum(r.rank)).reduce((a,b)=>a+b,0)/upperR.length:0);
+}
+function renderHeader(){
+    document.getElementById('header-level').textContent=`Level ${state.level}`; let next=Math.pow(state.level,2)*100, prev=Math.pow(state.level-1,2)*100;
+    document.getElementById('header-xp-fill').style.width=`${((state.xp-prev)/(next-prev))*100}%`; document.getElementById('header-xp-text').textContent=`${state.xp} / ${next} XP`;
+}
+function closeResult(){ document.getElementById('result-modal').classList.remove('open'); renderHistory();}
 function exportData(){ let b=new Blob([JSON.stringify(state)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='sovereign.json'; a.click();}
 
 // INIT
 document.getElementById('log-date').value=new Date().toISOString().split('T')[0];
-renderExercises(); renderLogView();
+renderExercises(); renderHeader();
 </script>
 </body>
 </html>
