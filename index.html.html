@@ -49,7 +49,7 @@
   .one-rm-display {background: rgba(200,169,110,0.1); padding: 15px; border-radius: 2px; text-align: center; margin: 15px 0; border: 1px dashed var(--accent);}
   
   .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:16px;}
-  input,select{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:2px;color:var(--text);padding:10px 14px;font-family:'Rajdhani',sans-serif;font-size:15px;}
+  input,select{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:2px;color:var(--text);padding:10px 14px;font-family:'Rajdhani',sans-serif;font-size:15px;outline:none;}
 
   .btn{padding:11px 28px;background:none;border:1px solid var(--accent);color:var(--accent);font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;}
   .btn-danger{border-color:#cc3344;color:#cc3344;}
@@ -63,7 +63,7 @@
   .log-entry{
     display:grid; grid-template-columns: auto 1fr auto auto; align-items:center; gap:14px; padding:10px 14px;
     background:rgba(255,255,255,0.02); border:1px solid var(--border); margin-bottom:8px; font-size:14px;
-    border-left: 3px solid transparent;
+    border-left: 4px solid transparent;
   }
 
   .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:12px;border-radius:2px;border:2px solid;flex-shrink:0;}
@@ -71,6 +71,10 @@
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .2s;}
   .modal-overlay.open{opacity:1;pointer-events:all;}
   .modal{background:#0d0d1a;border:1px solid var(--accent);padding:32px;width:100%;max-width:440px;margin:20px;max-height:90vh;overflow-y:auto;}
+
+  .history-link { font-size: 9px; color: var(--accent); text-decoration: underline; cursor: pointer; margin-top: 4px; display: inline-block;}
+  .benchmark-text {font-size: 11px; color: var(--muted); margin-top: 4px;}
+  .pb-text {font-size: 11px; color: var(--accent); font-weight: bold;}
 </style>
 </head>
 <body>
@@ -79,9 +83,9 @@
     <div class="logo-subtitle">// Ascension Protocol //</div>
     <h1 onclick="playSound('powerUp')">SOVEREIGN</h1>
     <div class="xp-container">
-      <div class="level-text" id="header-level">Level 1 Novice</div>
+      <div class="level-text" id="header-level" style="font-family:'Cinzel',serif; font-size:12px; color:var(--accent); margin-bottom:6px; text-transform:uppercase;">Level 1 Novice</div>
       <div class="xp-bar-bg"><div class="xp-bar-fill" id="header-xp-fill" style="width: 0%;"></div></div>
-      <div class="xp-text" id="header-xp-text">0 / 100 XP</div>
+      <div class="xp-text" id="header-xp-text" style="font-size:10px; color:var(--muted); margin-top:6px;">0 / 100 XP</div>
     </div>
   </header>
 
@@ -182,54 +186,79 @@ function playSound(t){
     o.start(); o.stop(n+0.5);
 }
 
-// --- STATE MANAGEMENT ---
-// Using v4_pro to keep your vfinal data safe.
-let state = JSON.parse(localStorage.getItem('sovereign_v4_pro') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"protocols":[]}');
-function save(){ localStorage.setItem('sovereign_v4_pro', JSON.stringify(state)); }
+// --- AT HOME ARSENAL BENCHMARKS (SSS TARGETS) ---
+const SEED_EXERCISES = [
+    {name: "Pull-Ups (Vest: 20kg)", unit: "reps", best: 15, body: "upper", type: "strength"},
+    {name: "Diamond Push-Ups (Vest: 20kg)", unit: "reps", best: 35, body: "upper", type: "strength"},
+    {name: "Floor Press (Barbell 1RM)", unit: "kg", best: 120, body: "upper", type: "strength"},
+    {name: "Overhead Press (Barbell 1RM)", unit: "kg", best: 80, body: "upper", type: "strength"},
+    {name: "Dumbbell Row (1RM/Equivalent)", unit: "kg", best: 50, body: "upper", type: "strength"},
+    {name: "Handstand Push-Ups (Wall)", unit: "reps", best: 12, body: "upper", type: "strength"},
+    {name: "Pistol Squats (Strict)", unit: "reps", best: 20, body: "lower", type: "strength"},
+    {name: "Bulgarian Split Squat (Vest)", unit: "reps", best: 30, body: "lower", type: "strength"},
+    {name: "Barbell Squat (Explosive 36kg)", unit: "reps", best: 50, body: "lower", type: "speed"},
+    {name: "Broad Jump (Distance)", unit: "minutes", best: 3.05, body: "lower", type: "speed"},
+    {name: "Weighted Plank (Vest: 20kg)", unit: "minutes", best: 5.00, body: "core", type: "strength"},
+    {name: "Band Swing Speed Potential", unit: "reps", best: 130, body: "core", type: "speed"},
+    {name: "5km Run (High Altitude)", unit: "minutes", best: 19.00, body: "cardio", type: "strength"}
+];
+
+let state = JSON.parse(localStorage.getItem('sovereign_at_home_v3') || '{"exercises":[],"logs":[],"unlockedAchs":{},"xp":0,"level":1,"path":"none"}');
+
+if (state.exercises.length === 0) {
+    SEED_EXERCISES.forEach((ex, i) => state.exercises.push({...ex, id: Date.now() + i, pb: null}));
+}
+
+function save(){ localStorage.setItem('sovereign_at_home_v3', JSON.stringify(state)); }
 
 const RC={F:'#555',D:'#7a4f2a',C:'#2e6b3e',B:'#1a5f8a',A:'#6a2ea0',S:'#c8a92e',SS:'#e07830',SSS:'#cc2040'};
 
-// --- 1RM CALCULATOR (Brzycki) ---
-function calc1RM(w, r) {
-    if (r <= 1) return w;
-    return w * (36 / (37 - r));
+// --- HELPERS ---
+function formatVal(v,u){ if(u!=='minutes' || isNaN(v) || v===null) return v; let s=Math.round(v*60); return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`; }
+function calc1RM(w, r) { if (r <= 1) return w; return w * (36 / (37 - r)); }
+
+function getRank(p){ 
+    if(p>=100) return 'SSS'; if(p>=85) return 'SS'; if(p>=70) return 'S';
+    if(p>=55) return 'A'; if(p>=40) return 'B'; if(p>=25) return 'C';
+    if(p>=10) return 'D'; return 'F';
 }
 
 // --- UI LOGIC ---
 function updateExInputUI(){
     const unit = document.getElementById('ex-unit').value;
-    document.getElementById('ex-best-standard-wrap').style.display = unit === 'minutes' ? 'none' : 'block';
-    document.getElementById('ex-best-time-wrap').style.display = unit === 'minutes' ? 'flex' : 'none';
+    document.getElementById('ex-best-standard-wrap').style.display = (unit === 'minutes') ? 'none' : 'block';
+    document.getElementById('ex-best-time-wrap').style.display = (unit === 'minutes') ? 'flex' : 'none';
 }
 
 function setupLogUI() {
     const ex = state.exercises.find(e => e.id == document.getElementById('log-exercise').value);
     const strengthUI = document.getElementById('strength-log-ui');
     const standardUI = document.getElementById('standard-log-ui');
-    const timeWrap = document.getElementById('log-amount-time-wrap');
-    const standardWrap = document.getElementById('log-amount-standard-wrap');
+    
+    // Auto-detect if we should use 1RM logic (Only if it's kg AND not a "Vest" exercise)
+    const isHeavyWeighted = ex && ex.unit === 'kg' && !ex.name.toLowerCase().includes('vest');
 
-    if (ex && ex.unit === 'kg') {
+    if (isHeavyWeighted) {
         strengthUI.style.display = 'block';
         standardUI.style.display = 'none';
         if (document.getElementById('set-container').children.length === 0) addSetRow();
     } else {
         strengthUI.style.display = 'none';
         standardUI.style.display = 'block';
-        timeWrap.style.display = ex && ex.unit === 'minutes' ? 'flex' : 'none';
-        standardWrap.style.display = ex && ex.unit === 'minutes' ? 'none' : 'block';
+        const isTime = ex && ex.unit === 'minutes';
+        document.getElementById('log-amount-time-wrap').style.display = isTime ? 'flex' : 'none';
+        document.getElementById('log-amount-standard-wrap').style.display = isTime ? 'none' : 'block';
     }
+    
+    let w = document.getElementById('shadow-display');
+    if(ex && ex.pb){ w.classList.add('active'); document.getElementById('shadow-val').textContent = formatVal(ex.pb, ex.unit); }
+    else w.classList.remove('active');
 }
 
 function addSetRow() {
     const container = document.getElementById('set-container');
-    const row = document.createElement('div');
-    row.className = 'set-row';
-    row.innerHTML = `
-        <input type="number" class="set-w" placeholder="kg" oninput="updateLive1RM()">
-        <input type="number" class="set-r" placeholder="reps" oninput="updateLive1RM()">
-        <button class="btn btn-danger btn-small" onclick="this.parentElement.remove(); updateLive1RM();">✖</button>
-    `;
+    const row = document.createElement('div'); row.className = 'set-row';
+    row.innerHTML = `<input type="number" class="set-w" placeholder="kg" oninput="updateLive1RM()"><input type="number" class="set-r" placeholder="reps" oninput="updateLive1RM()"><button class="btn btn-danger btn-small" onclick="this.parentElement.remove(); updateLive1RM();">✖</button>`;
     container.appendChild(row);
 }
 
@@ -244,75 +273,87 @@ function updateLive1RM() {
     return max;
 }
 
-// --- CORE LOGIC ---
+// --- CORE ---
 function addExercise(){
     const u = document.getElementById('ex-unit').value;
     let b;
     if(u==='minutes') b = (parseFloat(document.getElementById('ex-best-min').value)||0)+(parseFloat(document.getElementById('ex-best-sec').value)||0)/60;
     else b = parseFloat(document.getElementById('ex-best').value);
-    
-    state.exercises.push({
-        id: Date.now(),
-        name: document.getElementById('ex-name').value,
-        unit: u,
-        best: b,
-        body: document.getElementById('ex-body').value,
-        type: document.getElementById('ex-type').value,
-        pb: null
-    });
-    save(); location.reload();
+    state.exercises.push({id:Date.now(), name:document.getElementById('ex-name').value, unit:u, best:b, body:document.getElementById('ex-body').value, type:document.getElementById('ex-type').value, pb:null});
+    save(); renderExercises();
 }
+
+function renderExercises(){
+    document.getElementById('exercise-list').innerHTML = state.exercises.map(ex => `
+    <div class="exercise-card">
+        <div class="exercise-info">
+            <h3>${ex.name}</h3>
+            <div class="benchmark-text">SSS Benchmark: <strong>${formatVal(ex.best, ex.unit)}</strong></div>
+            ${ex.pb ? `<div class="pb-text">Personal Best: ${formatVal(ex.pb, ex.unit)}</div>` : ''}
+        </div>
+        <div class="exercise-actions"><button class="btn btn-danger btn-small" onclick="delEx(${ex.id})">Del</button></div>
+    </div>`).join('');
+}
+function delEx(id){ state.exercises=state.exercises.filter(e=>e.id!==id); save(); renderExercises(); }
 
 function submitLog() {
     const ex = state.exercises.find(e => e.id == document.getElementById('log-exercise').value);
     let val;
-    if (ex.unit === 'kg') {
-        val = updateLive1RM();
-    } else if (ex.unit === 'minutes') {
-        val = (parseFloat(document.getElementById('log-amount-min').value)||0)+(parseFloat(document.getElementById('log-amount-sec').value)||0)/60;
-    } else {
-        val = parseFloat(document.getElementById('log-amount').value);
-    }
+    const isHeavyWeighted = ex && ex.unit === 'kg' && !ex.name.toLowerCase().includes('vest');
 
-    if (!ex || isNaN(val)) return alert("Invalid entry");
+    if (isHeavyWeighted) val = updateLive1RM();
+    else if (ex.unit === 'minutes') val = (parseFloat(document.getElementById('log-amount-min').value)||0)+(parseFloat(document.getElementById('log-amount-sec').value)||0)/60;
+    else val = parseFloat(document.getElementById('log-amount').value);
 
+    if(!ex || isNaN(val)) return;
     const isPB = ex.pb === null || val > ex.pb;
-    if (isPB) { ex.pb = val; playSound('powerUp'); }
+    if(isPB) { ex.pb = val; playSound('powerUp'); } else playSound('success');
     
-    state.logs.push({id: Date.now(), exId: ex.id, val: val, ts: new Date(document.getElementById('log-date').value).getTime()});
-    state.xp += 50;
-    save();
-    showModal(ex, val, isPB);
+    state.logs.push({id:Date.now(), exId:ex.id, val, ts:new Date(document.getElementById('log-date').value).getTime()||Date.now()});
+    state.xp += 50; save(); renderHistory(); showModal(ex, val, isPB);
 }
 
 function showModal(ex, v, isPB) {
-    const p = Math.round((v / ex.best) * 100);
-    const r = p >= 100 ? 'SSS' : p >= 85 ? 'SS' : p >= 70 ? 'S' : p >= 55 ? 'A' : p >= 40 ? 'B' : p >= 25 ? 'C' : p >= 10 ? 'D' : 'F';
+    const p = Math.round((v / ex.best) * 100); const r = getRank(p);
     document.getElementById('modal-rank').textContent = r;
     document.getElementById('modal-rank').className = `rank-badge rank-${r}`;
     document.getElementById('modal-pct').textContent = `${p}% Ascension`;
-    document.getElementById('modal-val-detail').textContent = ex.unit === 'kg' ? `Calculated 1RM: ${v.toFixed(2)}kg` : `Performance: ${v}`;
+    document.getElementById('modal-val-detail').textContent = `Best: ${formatVal(v, ex.unit)}`;
     document.getElementById('result-modal').classList.add('open');
 }
 
-// --- SYSTEM ---
+function renderHistory(){
+    const sorted = [...state.logs].sort((a,b)=>b.ts-a.ts).slice(0,15);
+    document.getElementById('log-history').innerHTML = sorted.map(l => {
+        const ex = state.exercises.find(e => e.id == l.exId); if(!ex) return '';
+        const r = getRank(Math.round((l.val/ex.best)*100));
+        return `<div class="log-entry" style="border-left-color:${RC[r]}">
+            <div style="font-size:10px; color:var(--muted)">${new Date(l.ts).toLocaleDateString()}</div>
+            <div style="font-family:'Cinzel'; font-size:11px;">${ex.name}</div>
+            <div style="text-align:right"><strong>${formatVal(l.val, ex.unit)}</strong></div>
+            <button class="btn btn-danger btn-small" style="width:30px" onclick="deleteLog(${l.id})">✖</button>
+        </div>`;
+    }).join('');
+}
+function deleteLog(id){ state.logs=state.logs.filter(l=>l.id!==id); save(); renderHistory(); }
+
 function switchTab(n,e){
     playSound('click');
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    document.getElementById('view-'+n).classList.add('active');
-    e.classList.add('active');
+    document.getElementById('view-'+n).classList.add('active'); e.classList.add('active');
     if(n==='log') renderLogView();
 }
 function renderLogView(){
     document.getElementById('log-exercise').innerHTML='<option value="">-Select-</option>'+state.exercises.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
+    renderHistory();
 }
-function closeModal() { document.getElementById('result-modal').classList.remove('open'); }
-function exportData(){ let b=new Blob([JSON.stringify(state)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='sovereign_v4.json'; a.click();}
+function closeModal(){ document.getElementById('result-modal').classList.remove('open'); }
+function exportData(){ let b=new Blob([JSON.stringify(state)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='sovereign.json'; a.click();}
 
 // INIT
 document.getElementById('log-date').value=new Date().toISOString().split('T')[0];
-save();
+renderExercises(); renderLogView();
 </script>
 </body>
 </html>
